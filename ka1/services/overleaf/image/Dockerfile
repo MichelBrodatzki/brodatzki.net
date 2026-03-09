@@ -1,5 +1,5 @@
 # Custom ShareLatex image
-FROM sharelatex/sharelatex:5.5.7
+FROM sharelatex/sharelatex:6.1.2
 # Install inkscape for svg package
 RUN apt update; apt install --yes inkscape
 # Update texlive manager and install available packages
