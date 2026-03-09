@@ -28,7 +28,7 @@ spec:
       enableServiceLinks: false
       containers:
         - name: overleaf-sharelatex
-          image: ghcr.io/michelbrodatzki/ka1/sharelatex:main
+          image: ghcr.io/michelbrodatzki/brodatzki.net/ka1/sharelatex:main
           ports:
             - containerPort: 80
           volumeMounts:
