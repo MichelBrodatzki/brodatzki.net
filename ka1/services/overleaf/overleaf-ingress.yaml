@@ -1,0 +1,64 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: overleaf-https-gateway
+  annotations:
+    cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod" 
+spec:
+  gatewayClassName: cilium
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "overleaf.ka1.brodatzki.net"
+      tls:
+        mode: Terminate
+        certificateRefs:
+        - kind: Secret
+          name: overleaf-gateway-tls
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: "overleaf.ka1.brodatzki.net"
+      allowedRoutes:
+        namespaces:
+          from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: overleaf-http-to-https-redirect
+spec:
+  parentRefs:
+    - name: overleaf-https-gateway
+      sectionName: http
+  hostnames:
+    - "overleaf.ka1.brodatzki.net"
+  rules:
+    - filters:
+      - type: RequestRedirect
+        requestRedirect:
+          scheme: https
+          statusCode: 301
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: overleaf-service-route
+spec:
+  parentRefs:
+    - name: overleaf-https-gateway
+      sectionName: https
+  hostnames:
+    - "overleaf.ka1.brodatzki.net"
+  rules:
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /
+      backendRefs:
+        - name: overleaf-sharelatex
+          port: 8080

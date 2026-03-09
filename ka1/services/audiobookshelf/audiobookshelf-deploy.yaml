@@ -1,0 +1,120 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: audiobookshelf-config-pvc
+  namespace: audiobookshelf
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 512Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: audiobookshelf-metadata-pvc
+  namespace: audiobookshelf
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: audiobookshelf-deployment
+  namespace: audiobookshelf
+  labels:
+    app: audiobookshelf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: audiobookshelf
+  template:
+    metadata:
+      namespace: audiobookshelf
+      labels:
+        app: audiobookshelf
+    spec:
+      containers:
+        - name: audiobookshelf-container
+          image: ghcr.io/advplyr/audiobookshelf:2.25.1
+          volumeMounts:
+            - name: audiobookshelf-audiobook-share
+              mountPath: /audiobooks
+            - name: audiobookshelf-podcast-share
+              mountPath: /podcasts
+            - name: audiobookshelf-config-volume
+              mountPath: /config
+            - name: audiobookshelf-metadata-volume
+              mountPath: /metadata
+          ports:
+            - containerPort: 80
+          env:
+            - name: TZ
+              value: "Europe/Berlin"
+      volumes:
+        - name: audiobookshelf-audiobook-share
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/media/Hörbücher"
+            readOnly: true
+        - name: audiobookshelf-podcast-share
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/media/Podcasts"
+            readOnly: true
+        - name: audiobookshelf-config-volume
+          persistentVolumeClaim:
+            claimName: audiobookshelf-config-pvc
+        - name: audiobookshelf-metadata-volume
+          persistentVolumeClaim:
+            claimName: audiobookshelf-metadata-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: audiobookshelf-service
+  namespace: audiobookshelf
+  labels:
+    app: audiobookshelf
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: audiobookshelf
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: audiobookshelf-ingress
+  namespace: audiobookshelf
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - audiobookshelf.ka1.brodatzki.net
+    secretName: audiobookshelf-ingress-cm-tls
+  rules:
+  - host: audiobookshelf.ka1.brodatzki.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: audiobookshelf-service
+            port:
+              name: http

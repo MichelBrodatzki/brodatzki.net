@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plex-config-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-plex-claimtoken
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: secretstore-gitlab
+    kind: ClusterSecretStore
+  target:
+    name: secret-plex-claim
+  data:
+    - secretKey: token
+      remoteRef:
+        key: plex_claim_token
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex
+spec:
+  type: ClusterIP
+  ports:
+    - port: 32400
+      targetPort: 32400
+  selector:
+    app: plex
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plex
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      containers:
+        - name: plex
+          image: linuxserver/plex:1.43.0
+          ports:
+            - containerPort: 32400
+          volumeMounts:
+            - name: plex-config
+              mountPath: /config
+            - name: plex-movies
+              mountPath: /media/movies
+            - name: plex-series
+              mountPath: /media/series
+            - name: plex-musicvideos
+              mountPath: /media/musicvideos
+            - name: plex-music
+              mountPath: /media/music
+            - name: plex-test
+              mountPath: /media/test
+          env:
+            - name: TZ
+              value: Europe/Berlin
+            - name: PLEX_CLAIM
+              valueFrom:
+                secretKeyRef:
+                  name: secret-plex-claim
+                  key: token
+          imagePullPolicy: Always
+      volumes:
+        - name: plex-config
+          persistentVolumeClaim:
+            claimName: plex-config-pvc
+        - name: plex-movies
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/media/Filme"
+        - name: plex-series
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/media/Serien"
+        - name: plex-musicvideos
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/media/Musikvideos"
+        - name: plex-music
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/media/Musik"
+        - name: plex-test
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/media/Testvideos"

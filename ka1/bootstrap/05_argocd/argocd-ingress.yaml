@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-argocd
+  namespace: argocd
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "https"
+    cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - argo.ka1.brodatzki.net
+    secretName: argocd-ingress-cm-tls
+  rules:
+  - host: argo.ka1.brodatzki.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: argocd-server
+            port:
+              name: https

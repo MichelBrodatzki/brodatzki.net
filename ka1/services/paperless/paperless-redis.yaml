@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-redis-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paperless-redis
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: paperless-redis
+  clusterIP: None
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-paperless-to-redis
+spec:
+  podSelector:
+    matchLabels:
+      app: paperless-redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: paperless-paperless
+      ports:
+        - protocol: TCP
+          port: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: paperless-redis
+spec:
+  selector:
+    matchLabels:
+      app: paperless-redis
+  template:
+    metadata:
+      labels:
+        app: paperless-redis
+    spec:
+      hostname: paperless-redis
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
+      containers:
+        - name: paperless-redis
+          image: docker.io/library/redis:8
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: paperless-redis-pvc

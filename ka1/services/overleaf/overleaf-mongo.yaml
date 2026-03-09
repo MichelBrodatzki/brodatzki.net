@@ -1,0 +1,113 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: overleaf-mongo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: overleaf-mongo
+spec:
+  ports:
+    - port: 27017
+  selector:
+    app: overleaf-mongo
+  clusterIP: None
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-sharelatex-to-mongo
+spec:
+  podSelector:
+    matchLabels:
+      app: overleaf-mongo
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: overleaf-sharelatex
+        - podSelector:
+            matchLabels:
+              app: overleaf-mongo
+      ports:
+        - protocol: TCP
+          port: 27017
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: overleaf-mongo-init-script
+data:
+  mongodb-init-replica-set.js: |
+    try {
+      rs.status();
+    } catch (e) {
+      rs.initiate({ _id: 'overleaf', members: [{ _id: 0, host: 'overleaf-mongo:27017' }] });
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: overleaf-mongo
+spec:
+  selector:
+    matchLabels:
+      app: overleaf-mongo
+  template:
+    metadata:
+      labels:
+        app: overleaf-mongo
+    spec:
+      hostname: overleaf-mongo
+      containers:
+        - name: overleaf-mongo
+          image: mongo:6.0
+          command: ["mongod", "--replSet", "overleaf", "--bind_ip", "0.0.0.0"]
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: sharelatex
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+            - name: mongo-init
+              mountPath: /scripts/init-replica-set.js
+              subPath: mongodb-init-replica-set.js
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - "/bin/sh"
+                  - "-c"
+                  - >
+                    until mongosh --eval "print(\"waited for connection\")"; do sleep 2; done; 
+                    mongosh < /scripts/init-replica-set.js;
+#          livenessProbe:
+#            exec:
+#              command:
+#                - mongosh
+#                - --quiet
+#                - --eval
+#                - "db.stats().ok"
+#                - localhost:27017/test
+#            periodSeconds: 10
+#            initialDelaySeconds: 10
+#            failureThreshold: 5
+      volumes:
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: overleaf-mongo-pvc
+        - name: mongo-init
+          configMap:
+            name: overleaf-mongo-init-script

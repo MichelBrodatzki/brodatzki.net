@@ -1,0 +1,185 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: n8n-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 16Gi
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-n8n-runners-auth-token
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: secretstore-gitlab
+    kind: ClusterSecretStore
+  target:
+    name: secret-n8n-runners
+  data:
+    - secretKey: token
+      remoteRef:
+        key: n8n_runners_auth_token
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 5678
+      targetPort: 5678
+    - name: runners
+      port: 5679
+      targetPort: 5679
+  selector:
+    app: n8n
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      hostname: n8n
+      containers:
+        - name: n8n
+          image: n8nio/n8n:2.10.4
+          securityContext:
+            runAsUser: 0
+          ports:
+            - containerPort: 5678
+            - containerPort: 5679
+          volumeMounts:
+            - name: n8n-data
+              mountPath: /root/.n8n
+            - name: n8n-shared
+              mountPath: /shared
+          env:
+            - name: TZ
+              value: Europe/Berlin
+            - name: GENERIC_TIMEZONE
+              value: Europe/Berlin
+            - name: DOMAIN_NAME
+              value: ka1.brodatzki.net
+            - name: SUBDOMAIN
+              value: n8n
+            - name: NODE_ENV
+              value: production
+            - name: WEBHOOK_URL
+              value: https://n8n.ka1.brodatzki.net/
+            - name: N8N_HOST
+              value: n8n.ka1.brodatzki.net
+            - name: N8N_PORT
+              value: "5678"
+            - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+              value: "true"
+            - name: EXECUTIONS_DATA_PRUNE
+              value: "true"
+            - name: EXECUTIONS_DATA_MAX_AGE
+              value: "720"
+            - name: EXECUTIONS_DATA_PRUNE_MAX_COUNT
+              value: "50000"
+            - name: DB_SQLITE_VACUUM_ON_STARTUP
+              value: "true"
+            - name: N8N_RUNNERS_MODE
+              value: "external"
+            - name: N8N_RUNNERS_BROKER_LISTEN_ADDRESS
+              value: "::"
+            - name: N8N_RUNNERS_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: secret-n8n-runners
+                  key: token
+            - name: N8N_NATIVE_PYTHON_RUNNER
+              value: "true"
+            - name: N8N_MIGRATE_FS_STORAGE_PATH
+              value: "true"
+            - name: N8N_RESTRICT_FILE_ACCESS_TO
+              value: "/shared"
+            - name: EXPRESS_TRUST_PROXY
+              value: "true"
+          imagePullPolicy: Always
+      volumes:
+        - name: n8n-data
+          persistentVolumeClaim:
+            claimName: n8n-data-pvc
+        - name: n8n-shared
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/appdata/n8n"
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-to-n8n-service-http
+spec:
+  podSelector:
+    matchLabels:
+      app: n8n
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+      - protocol: TCP
+        port: 5678
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-n8n-runners-to-service
+spec:
+  podSelector:
+    matchLabels:
+      app: n8n
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app: n8n
+      - podSelector:
+          matchLabels:
+            app: n8n-runner
+    - ports:
+      - protocol: TCP
+        port: 5679
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-n8n-service-to-runners
+spec:
+  podSelector:
+    matchLabels:
+      app: n8n-runner
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: n8n
+        - podSelector:
+            matchLabels:
+              app: n8n-runner
+    - ports:
+      - protocol: TCP
+        port: 5680

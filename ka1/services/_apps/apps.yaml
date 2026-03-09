@@ -1,0 +1,125 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: overleaf
+  namespace: argocd
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: HEAD
+    path: ka1/services/overleaf/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: overleaf
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: plex
+  namespace: argocd
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: HEAD
+    path: ka1/services/plex/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: plex
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homeassistant
+  namespace: argocd
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: HEAD
+    path: ka1/services/homeassistant/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: homeassistant
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: paperless
+  namespace: argocd
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: HEAD
+    path: ka1/services/paperless/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: paperless
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mosquitto
+  namespace: argocd
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: HEAD
+    path: ka1/services/mosquitto/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mosquitto
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: zigbee2mqtt
+  namespace: argocd
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: HEAD
+    path: ka1/services/zigbee2mqtt/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: zigbee2mqtt
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: n8n
+  namespace: argocd
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: HEAD
+    path: ka1/services/n8n/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: n8n

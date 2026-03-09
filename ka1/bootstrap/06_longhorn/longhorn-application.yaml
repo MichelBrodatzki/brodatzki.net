@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: longhorn-system
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  sources:
+    - chart: longhorn
+      repoURL: https://charts.longhorn.io/
+      targetRevision: v1.10.1 # Replace with the Longhorn version you'd like to install or upgrade to
+      helm:
+        values: |
+          preUpgradeChecker:
+            jobEnabled: false
+          defaultBackupStore:
+            backupTarget: "nfs://storage1.ka1.brodatzki.network:/mnt/pool1/backups/kube1"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+  # add ignoreDifferences to prevent preserveUnknownFields field from make causing the application to be out of sync
+  ignoreDifferences:
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      name: engineimages.longhorn.io
+      jsonPointers: ["/spec/preserveUnknownFields"]
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      name: engines.longhorn.io
+      jsonPointers: ["/spec/preserveUnknownFields"]
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      name: instancemanagers.longhorn.io
+      jsonPointers: ["/spec/preserveUnknownFields"]
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      name: nodes.longhorn.io
+      jsonPointers: ["/spec/preserveUnknownFields"]
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      name: replicas.longhorn.io
+      jsonPointers: ["/spec/preserveUnknownFields"]
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      name: settings.longhorn.io
+      jsonPointers: ["/spec/preserveUnknownFields"]
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      name: volumes.longhorn.io
+      jsonPointers: ["/spec/preserveUnknownFields"]

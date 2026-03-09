@@ -1,0 +1,16 @@
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: secretstore-gitlab
+spec:
+  provider:
+    gitlab:
+      url: https://git.brodatzki.com/
+      auth:
+        SecretRef:
+          accessToken:
+            name: gitlab-secret
+            key: token
+            namespace: external-secrets
+      projectID: "9"
+

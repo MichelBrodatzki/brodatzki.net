@@ -1,0 +1,64 @@
+apiVersion: cilium.io/v2
+kind: CiliumBGPClusterConfig
+metadata:
+  name: cilium-bgp
+spec:
+  nodeSelector:
+    matchLabels:
+      topology.kubernetes.io/zone: kube1
+  bgpInstances:
+    - name: "instance-65000"
+      localASN: 65000
+      peers:
+        - name: "peer-65000-router"
+          peerASN: 65000
+          peerAddress: 10.10.40.1
+          peerConfigRef: 
+            name: "cilium-peer"
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPPeerConfig
+metadata:
+  name: cilium-peer
+spec:
+  timers:
+    connectRetryTimeSeconds: 120
+    holdTimeSeconds: 90
+    keepAliveTimeSeconds: 30
+  ebgpMultihop: 1
+  gracefulRestart:
+    enabled: true
+    restartTimeSeconds: 15
+  transport:
+    peerPort: 179
+  families:
+    - afi: ipv4
+      safi: unicast
+      advertisements:
+        matchLabels:
+          advertise: "bgp"
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPAdvertisement
+metadata:
+  name: bgp-advertisements
+  labels:
+    advertise: bgp
+spec:
+  advertisements:
+    - advertisementType: "Service"
+      service:
+        addresses:
+          - LoadBalancerIP
+      selector:
+        matchExpressions:
+         - {key: somekey, operator: NotIn, values: ['never-used-value']}
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "cilium-lb-pool"
+spec:
+  blocks:
+  - start: "10.10.41.1"
+    stop: "10.10.41.254"

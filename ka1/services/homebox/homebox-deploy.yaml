@@ -1,0 +1,150 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homebox-pvc
+  namespace: homebox
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: homebox-deployment
+  namespace: homebox
+  labels:
+    app: homebox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homebox
+  template:
+    metadata:
+      namespace: homebox
+      labels:
+        app: homebox
+    spec:
+      containers:
+        - name: homebox-container
+          image: ghcr.io/sysadminsmedia/homebox:0.19-rootless
+          volumeMounts:
+            - name: homebox-data-volume
+              mountPath: /data
+          ports:
+            - containerPort: 7745
+          env:
+            - name: HBOX_OPTIONS_ALLOW_REGISTRATION
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: options_allow_registration
+            - name: HBOX_OPTIONS_ALLOW_ANALYTICS
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: options_allow_analytics
+            - name: HBOX_WEB_MAX_UPLOAD
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: web_max_upload
+            - name: HBOX_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: log_level
+            - name: HBOX_LOG_FORMAT
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: log_format
+            - name: HBOX_DATABASE_DRIVER
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: database_driver
+            - name: HBOX_DATABASE_SQLITE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: database_sqlite_path
+            - name: HBOX_OPTIONS_CHECK_GITHUB_RELEASE
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: options_check_github_release
+            - name: HBOX_LABEL_MAKER_WIDTH
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: label_maker_width
+            - name: HBOX_LABEL_MAKER_HEIGHT
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: label_maker_height
+            - name: HBOX_LABEL_MAKER_PADDING
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: label_maker_padding
+            - name: HBOX_LABEL_MAKER_FONT_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: homebox-config
+                  key: label_maker_font_size
+      volumes:
+        - name: homebox-data-volume
+          persistentVolumeClaim:
+            claimName: homebox-pvc
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homebox-service
+  namespace: homebox
+  labels:
+    app: homebox
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 7745
+  selector:
+    app: homebox
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homebox-ingress
+  namespace: homebox
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - inventory.ka1.brodatzki.net
+    secretName: homebox-ingress-cm-tls
+  rules:
+  - host: inventory.ka1.brodatzki.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: homebox-service
+            port:
+              name: http

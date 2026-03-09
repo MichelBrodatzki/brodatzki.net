@@ -1,0 +1,4 @@
+domain: ka1.brodatzki.net
+watchedResources: ["HTTPRoute"]
+service:
+  loadBalancerIP: 10.10.41.254

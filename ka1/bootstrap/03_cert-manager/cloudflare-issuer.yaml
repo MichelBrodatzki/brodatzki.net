@@ -1,0 +1,35 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-cloudflare-acme-api-token
+  namespace: cert-manager
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: secretstore-gitlab
+    kind: ClusterSecretStore
+  target:
+    name: secret-cloudflare-acme
+  data:
+    - secretKey: api-token
+      remoteRef:
+        key: cloudflare_acme_api_token
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: clusterissuer-cloudflare-acme-prod
+  namespace: cert-manager
+spec:
+  acme:
+    email: admin+acme@brodatzki.net
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: secret-clusterissuer-cloudflare-account-key
+    solvers:
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            name: secret-cloudflare-acme
+            key: api-token
+

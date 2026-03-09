@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homeassistant-config
+data:
+  configuration.yaml: |
+    assist_pipeline:
+    backup:
+    bluetooth:
+    cloud:
+    config:
+    conversation:
+    energy:
+    go2rtc:
+    history:
+    homeassistant_alerts:
+    image_upload:
+    logbook:
+    media_source:
+    mobile_app:
+    my:
+    stream:
+    sun:
+    usage_prediction:
+    webhook:
+
+    frontend:
+      themes: !include_dir_merge_named themes
+
+    http:
+      use_x_forwarded_for: true
+      trusted_proxies:
+        - 10.244.0.0/16
+
+    sonos: !include sonos.yaml
+  
+    automation: !include automations.yaml
+    script: !include scripts.yaml
+    scene: !include scenes.yaml
+  sonos.yaml: |
+    media_player:
+      advertise_addr: 10.10.41.253
+      hosts:
+        - 10.10.20.11
+        - 10.10.20.12
+        - 10.10.20.13

@@ -1,0 +1,13 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: applications
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: HEAD
+    path: ka1/services/_apps/
+  destination:
+    server: https://kubernetes.default.svc

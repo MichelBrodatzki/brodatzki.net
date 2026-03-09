@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-paperless-secret-key
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: secretstore-gitlab
+    kind: ClusterSecretStore
+  target:
+    name: secret-paperless-secret-key
+  data:
+    - secretKey: key
+      remoteRef:
+        key: paperless_secret_key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paperless-paperless
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+  selector:
+    app: paperless-paperless
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless-paperless
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paperless-paperless
+  template:
+    metadata:
+      labels:
+        app: paperless-paperless
+    spec:
+      hostname: paperless-paperless
+      enableServiceLinks: false
+      containers:
+        - name: paperless-paperless
+          image: ghcr.io/paperless-ngx/paperless-ngx:2.20.3
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: paperless-data
+              mountPath: /usr/src/paperless/data
+            - name: paperless-consume
+              mountPath: /usr/src/paperless/consume
+            - name: paperless-export
+              mountPath: /usr/src/paperless/export
+            - name: paperless-media
+              mountPath: /usr/src/paperless/media
+          env:
+            - name: PAPERLESS_URL
+              value: https://paperless.ka1.brodatzki.net
+            - name: PAPERLESS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secret-paperless-secret-key
+                  key: key
+            - name: PAPERLESS_REDIS
+              value: redis://paperless-redis:6379
+            - name: PAPERLESS_CONSUMER_RECURSIVE
+              value: "1"
+            - name: PAPERLESS_CONSUMER_POLLING
+              value: "10"
+            - name: PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED
+              value: "1"
+            - name: PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME
+              value: doublesided
+            - name: PAPERLESS_TIKA_ENABLED
+              value: "1"
+            - name: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+              value: http://paperless-gotenberg:3000
+            - name: PAPERLESS_TIKA_ENDPOINT
+              value: http://paperless-tika:9998
+          imagePullPolicy: Always
+      volumes:
+        - name: paperless-data
+          persistentVolumeClaim:  
+            claimName: paperless-data-pvc
+        - name: paperless-consume
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/appdata/paperless/consume"
+        - name: paperless-export
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/appdata/paperless/export"
+        - name: paperless-media
+          nfs:
+            server: storage1.ka1.brodatzki.network
+            path: "/mnt/pool1/appdata/paperless/media"

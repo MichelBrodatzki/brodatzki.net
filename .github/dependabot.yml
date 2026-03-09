@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "docker"
+    directories:
+      - "/ka1/services/homeassistant"
+      - "/ka1/services/mosquitto"
+      - "/ka1/services/n8n"
+      - "/ka1/services/plex"
+      - "/ka1/services/zigbee2mqtt"
+      - "/ka1/services/overleaf/image"
+    schedule:
+      interval: "daily"
