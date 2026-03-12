@@ -5,6 +5,8 @@ name: Create and publish custom sharelatex image
 on:
   workflow_dispatch:
   push:
+    branches:
+      - 'main'
     paths:
       - 'ka1/services/overleaf/image/Dockerfile'
 
