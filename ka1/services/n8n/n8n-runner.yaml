@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: n8n-runner
-          image: n8nio/runners:2.11.2
+          image: n8nio/runners:2.11.3
           ports:
             - containerPort: 5680
           env:
