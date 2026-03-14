@@ -18,6 +18,13 @@
                 "iam:ListRolePolicies"
             ],
             "Resource": "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetPolicy"
+            ],
+            "Resource": "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access"
         }
     ]
 }
