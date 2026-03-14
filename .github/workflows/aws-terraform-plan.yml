@@ -60,8 +60,8 @@ jobs:
           for changed_folder in ${CHANGED_DIRS}; do
             cd $changed_folder
             echo "Planning '$changed_folder'"
-            terraform init -input=false
-            terraform validate
-            terraform plan -input=false
+            terraform init -input=false >/dev/null
+            terraform validate >/dev/null
+            terraform plan -input=false -lock=false
             cd $ORIGINAL_FOLDER
           done
