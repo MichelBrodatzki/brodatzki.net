@@ -42,6 +42,11 @@ jobs:
         env:
           ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
+          if [[ -z $ALL_CHANGED_FILES ]]; then
+                  echo "No changed files found!"
+                  exit 1
+          fi
+
           CHANGED_FILE_DIRS=()
           for file in ${ALL_CHANGED_FILES}; do
             CHANGED_FILE_DIRS+=("$(dirname $file)")
