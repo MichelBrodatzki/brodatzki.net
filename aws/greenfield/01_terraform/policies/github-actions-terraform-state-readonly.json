@@ -22,7 +22,9 @@
         {
             "Effect": "Allow",
             "Action": [
-                "iam:GetPolicy"
+                "iam:GetPolicy",
+                "iam:GetPolicyVersion",
+                "iam:ListPolicyVersions"
             ],
             "Resource": "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access"
         }
