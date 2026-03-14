@@ -1,0 +1,68 @@
+name: Terraform apply deployment to AWS
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'aws/services/**.tf'
+
+env:
+  AWS_REGION : "eu-central-1"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: arn:aws:iam::891920435804:role/github-actions-terraform-state-readwrite
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Get changed files
+        uses: tj-actions/changed-files@v47.0.5
+        id: changed-files
+        with:
+          files: |
+            aws/**/*.tf
+
+      - name: Execute Terraform plan on changed folders
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          if [[ -z $ALL_CHANGED_FILES ]]; then
+                  echo "No changed files found!"
+                  exit 1
+          fi
+
+          CHANGED_FILE_DIRS=()
+          for file in ${ALL_CHANGED_FILES}; do
+            CHANGED_FILE_DIRS+=("$(dirname $file)")
+          done
+          
+          CHANGED_DIRS=$(printf "%s\n" ${CHANGED_FILE_DIRS[@]} | uniq)
+          echo "Amount of changed AWS Terraform directories: ${#CHANGED_DIRS[@]}"
+        
+          ORIGINAL_FOLDER=$(pwd)
+
+          for changed_folder in ${CHANGED_DIRS}; do
+            cd $changed_folder
+            echo -e "::group::\e[1m\e[44mDeploying '$changed_folder'\e[0m"
+            terraform init -input=false >/dev/null
+            terraform validate >/dev/null
+            terraform apply -input=false -auto-approve
+            echo -e "::endgroup::"
+            cd $ORIGINAL_FOLDER
+          done
