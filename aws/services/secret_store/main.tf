@@ -46,6 +46,11 @@ data "aws_iam_policy_document" "ka1_workload_ssm" {
       "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/ka1/*"
     ]
   }
+  statement {
+    effect = "Allow"
+    actions = ["kms:Decrypt"]
+    resources = ["arn:aws:kms:eu-central-1:${data.aws_caller_identity.current.account_id}:alias/aws/ssm"]
+  }
 }
 
 resource "aws_iam_policy" "ka1_workload_ssm" {
