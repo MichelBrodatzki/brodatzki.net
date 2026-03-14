@@ -59,9 +59,10 @@ jobs:
 
           for changed_folder in ${CHANGED_DIRS}; do
             cd $changed_folder
-            echo -e "\n\e[1m\e[44mPlanning '$changed_folder'\e[0m"
+            echo -e "::group::\e[1m\e[44mPlanning '$changed_folder'\e[0m"
             terraform init -input=false >/dev/null
             terraform validate >/dev/null
             terraform plan -input=false -lock=false
+            echo -e "::endgroup::"
             cd $ORIGINAL_FOLDER
           done
