@@ -1,0 +1,60 @@
+name: Terraform plan deployment to AWS
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+    paths:
+      - 'aws/services/**.tf'
+
+env:
+  AWS_REGION : "eu-central-1"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: arn:aws:iam::891920435804:role/github-actions-terraform-state-readonly
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Get changed files
+        uses: tj-actions/changed-files@v47.0.5
+        id: changed-files
+        with:
+          files: |
+            aws/services/**.tf
+
+      - name: Execute Terraform plan on changed folders
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          CHANGED_FILE_DIRS=()
+          for file in ${ALL_CHANGED_FILES}; do
+            CHANGED_FILE_DIRS+=("$(dirname $file)")
+          done
+          CHANGED_DIRS=$(printf "%s\n" ${CHANGED_FILE_DIRS[@]} | uniq)
+
+          ORIGINAL_FOLDER=$(pwd)
+
+          for changed_folder in $CHANGED_DIRS; do
+            cd $changed_folder
+            echo "Planning '$changed_folder'"
+            terraform init -input=false
+            terraform validate
+            terraform plan -input=false
+            cd $ORIGINAL_FOLDER
+          done
