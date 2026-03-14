@@ -46,8 +46,10 @@ jobs:
           for file in ${ALL_CHANGED_FILES}; do
             CHANGED_FILE_DIRS+=("$(dirname $file)")
           done
+          
           CHANGED_DIRS=$(printf "%s\n" ${CHANGED_FILE_DIRS[@]} | uniq)
-
+          echo "Amount of changed AWS Terraform directories: ${#CHANGED_DIRS[@]}"
+        
           ORIGINAL_FOLDER=$(pwd)
 
           for changed_folder in $CHANGED_DIRS; do
