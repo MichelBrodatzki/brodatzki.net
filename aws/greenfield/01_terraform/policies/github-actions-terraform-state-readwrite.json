@@ -36,6 +36,7 @@
             "Effect": "Allow",
             "Action": [
                 "iam:CreatePolicy",
+                "iam:CreatePolicyVersion",
                 "iam:DeletePolicy",
                 "iam:TagPolicy",
                 "iam:GetPolicy",
