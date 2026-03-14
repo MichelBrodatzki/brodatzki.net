@@ -1,0 +1,36 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateOpenIDConnectProvider",
+                "iam:DeleteOpenIDConnectProvider",
+                "iam:GetOpenIDConnectProvider",
+                "iam:UpdateOpenIDConnectProvider",
+                "iam:TagOpenIDConnectProvider"
+            ],
+            "Resource": "arn:aws:iam::891920435804:oidc-provider/raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:GetRole",
+                "iam:UpdateRole",
+                "iam:TagRole",
+                "iam:ListRoleTags",
+                "iam:PassRole",
+                "iam:GetRolePolicy",
+                "iam:PutRolePolicy",
+                "iam:DeleteRolePolicy",
+                "iam:AttachRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListRolePolicies"
+            ],
+            "Resource": "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly"
+        }
+    ]
+}

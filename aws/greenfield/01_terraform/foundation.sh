@@ -8,20 +8,11 @@ trap cleanup EXIT
 
 printf '\033[0;35m%s\033[0m\n' "This script will configure AWS for usage with terraform. This includes the state bucket as well as all necessary project policies."
 
-# Find AWS CLI profile
-aws_cli_profiles=("${(@f)$(aws configure list-profiles)}")
-
-if [[ ${#aws_cli_profiles[@]} -eq 1 ]]; then
-	printf '\033[0;37m%s\033[0m\n' "Only one AWS CLI profile configured."
-	aws_cli_profile="$aws_cli_profiles"
-else
-	printf '\033[0;33m%s\033[0m\n' "WARNING: Found ${#aws_cli_profiles[@]} AWS CLI profiles."
-	select aws_cli_profile in "${aws_cli_profiles[@]}"; do
-		[[ -n "$aws_cli_profile" ]] && break
-	done
+if [[ -z "${AWS_CLI_PROFILE:-}" ]]; then
+	printf '\033[0;31m%s\033[0m\n' "ERROR: AWS_CLI_PROFILE is not set. Run this script via greenfield.sh or set AWS_CLI_PROFILE."
+	exit 1
 fi
-
-printf '\033[0;32m%s\033[0m\n' "Chose profile $aws_cli_profile for deployment ..."
+aws_cli_profile="$AWS_CLI_PROFILE"
 
 # Construct tf-state S3 bucket name
 aws_account_id=$(aws sts get-caller-identity --query Account --output text --profile "$aws_cli_profile")

@@ -1,0 +1,23 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetOpenIDConnectProvider"
+            ],
+            "Resource": "arn:aws:iam::891920435804:oidc-provider/raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRole",
+                "iam:ListRoleTags",
+                "iam:GetRolePolicy",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListRolePolicies"
+            ],
+            "Resource": "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly"
+        }
+    ]
+}
