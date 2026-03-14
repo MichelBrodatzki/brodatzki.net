@@ -52,7 +52,7 @@ jobs:
         
           ORIGINAL_FOLDER=$(pwd)
 
-          for changed_folder in $CHANGED_DIRS; do
+          for changed_folder in ${CHANGED_DIRS}; do
             cd $changed_folder
             echo "Planning '$changed_folder'"
             terraform init -input=false
