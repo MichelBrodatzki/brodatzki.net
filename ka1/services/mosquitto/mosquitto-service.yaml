@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: mosquitto-sa 
+  name: mosquitto-secrets-sa
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
 ---
@@ -17,7 +17,7 @@ spec:
       auth:
         jwt:
           serviceAccountRef:
-            name: mosquitto-sa
+            name: mosquitto-secrets-sa
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

@@ -1,4 +1,25 @@
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: n8n-secrets-sa 
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: n8n-secretstore
+spec:
+  provider:
+    aws:
+      service: ParameterStore
+      region: eu-central-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: n8n-secrets-sa
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: n8n-data-pvc
@@ -17,14 +38,14 @@ metadata:
 spec:
   refreshPolicy: CreatedOnce
   secretStoreRef:
-    name: secretstore-gitlab
-    kind: ClusterSecretStore
+    name: n8n-secretstore
+    kind: SecretStore
   target:
     name: secret-n8n-runners
   data:
     - secretKey: token
       remoteRef:
-        key: n8n_runners_auth_token
+        key: /ka1/n8n/runner_auth_token
 ---
 apiVersion: v1
 kind: Service

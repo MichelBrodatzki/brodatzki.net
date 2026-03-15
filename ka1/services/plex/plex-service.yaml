@@ -10,22 +10,6 @@ spec:
     requests:
       storage: 1Gi
 ---
-apiVersion: external-secrets.io/v1
-kind: ExternalSecret
-metadata:
-  name: externalsecret-plex-claimtoken
-spec:
-  refreshPolicy: CreatedOnce
-  secretStoreRef:
-    name: secretstore-gitlab
-    kind: ClusterSecretStore
-  target:
-    name: secret-plex-claim
-  data:
-    - secretKey: token
-      remoteRef:
-        key: plex_claim_token
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -73,11 +57,6 @@ spec:
           env:
             - name: TZ
               value: Europe/Berlin
-            - name: PLEX_CLAIM
-              valueFrom:
-                secretKeyRef:
-                  name: secret-plex-claim
-                  key: token
           imagePullPolicy: Always
       volumes:
         - name: plex-config

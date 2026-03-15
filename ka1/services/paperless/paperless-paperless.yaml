@@ -1,4 +1,25 @@
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: paperless-secrets-sa 
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: paperless-secretstore
+spec:
+  provider:
+    aws:
+      service: ParameterStore
+      region: eu-central-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: paperless-secrets-sa
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: paperless-data-pvc
@@ -17,14 +38,14 @@ metadata:
 spec:
   refreshPolicy: CreatedOnce
   secretStoreRef:
-    name: secretstore-gitlab
-    kind: ClusterSecretStore
+    name: paperless-secretstore
+    kind: SecretStore
   target:
     name: secret-paperless-secret-key
   data:
     - secretKey: key
       remoteRef:
-        key: paperless_secret_key
+        key: /ka1/paperless/secret_key
 ---
 apiVersion: v1
 kind: Service
