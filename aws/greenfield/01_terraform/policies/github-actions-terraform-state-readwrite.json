@@ -45,6 +45,105 @@
                 "iam:ListPolicyVersions"
             ],
             "Resource": "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateServiceLinkedRole"
+            ],
+            "Resource": "arn:aws:iam::891920435804:role/aws-service-role/rolesanywhere.amazonaws.com/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rolesanywhere:CreateTrustAnchor"
+            ],
+            "Resource": "arn:aws:rolesanywhere:eu-central-1:891920435804:trust-anchor/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:RequestTag/project": "backups"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rolesanywhere:GetTrustAnchor",
+                "rolesanywhere:UpdateTrustAnchor",
+                "rolesanywhere:DeleteTrustAnchor",
+                "rolesanywhere:EnableTrustAnchor",
+                "rolesanywhere:DisableTrustAnchor",
+                "rolesanywhere:TagResource",
+                "rolesanywhere:ListTagsForResource"
+            ],
+            "Resource": "arn:aws:rolesanywhere:eu-central-1:891920435804:trust-anchor/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:ResourceTag/project": "backups"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rolesanywhere:CreateProfile"
+            ],
+            "Resource": "arn:aws:rolesanywhere:eu-central-1:891920435804:profile/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:RequestTag/project": "backups"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rolesanywhere:GetProfile",
+                "rolesanywhere:UpdateProfile",
+                "rolesanywhere:DeleteProfile",
+                "rolesanywhere:EnableProfile",
+                "rolesanywhere:DisableProfile",
+                "rolesanywhere:TagResource",
+                "rolesanywhere:ListTagsForResource"
+            ],
+            "Resource": "arn:aws:rolesanywhere:eu-central-1:891920435804:profile/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:ResourceTag/project": "backups"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:GetRole",
+                "iam:UpdateRole",
+                "iam:TagRole",
+                "iam:ListRoleTags",
+                "iam:PassRole",
+                "iam:GetRolePolicy",
+                "iam:PutRolePolicy",
+                "iam:DeleteRolePolicy",
+                "iam:AttachRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListRolePolicies",
+                "iam:UpdateAssumeRolePolicy"
+            ],
+            "Resource": "arn:aws:iam::891920435804:role/*-backup"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:CreateBucket",
+                "s3:DeleteBucket",
+                "s3:ListBucket",
+                "s3:Get*",
+                "s3:Put*"
+            ],
+            "Resource": "arn:aws:s3:::backups-brodatzkinet-891920435804"
         }
     ]
 }

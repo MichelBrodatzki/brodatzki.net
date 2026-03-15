@@ -27,6 +27,51 @@
                 "iam:ListPolicyVersions"
             ],
             "Resource": "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rolesanywhere:GetTrustAnchor",
+                "rolesanywhere:ListTagsForResource"
+            ],
+            "Resource": "arn:aws:rolesanywhere:eu-central-1:891920435804:trust-anchor/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:ResourceTag/project": "backups"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rolesanywhere:GetProfile",
+                "rolesanywhere:ListTagsForResource"
+            ],
+            "Resource": "arn:aws:rolesanywhere:eu-central-1:891920435804:profile/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:ResourceTag/project": "backups"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRole",
+                "iam:ListRoleTags",
+                "iam:GetRolePolicy",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListRolePolicies"
+            ],
+            "Resource": "arn:aws:iam::891920435804:role/*-backup"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:Get*"
+            ],
+            "Resource": "arn:aws:s3:::backups-brodatzkinet-891920435804"
         }
     ]
 }
