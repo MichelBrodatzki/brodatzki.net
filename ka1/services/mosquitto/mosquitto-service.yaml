@@ -1,7 +1,9 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: mosquitto-sa
+  name: mosquitto-sa 
+  annotation:
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
 ---
 apiVersion: external-secrets.io/v1
 kind: SecretStore
@@ -12,7 +14,6 @@ spec:
     aws:
       service: ParameterStore
       region: eu-central-1
-      role: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
       auth:
         jwt:
           serviceAccountRef:
