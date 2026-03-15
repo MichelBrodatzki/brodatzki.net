@@ -3,7 +3,6 @@ locals {
     "vps1.netcup.brodatzki.network",
   ]
 
-  # "vps1.netcup.brodatzki.network" → "vps1_netcup_brodatzki_network"
   backup_hosts_map = {
     for host in local.backup_hosts : replace(host, ".", "_") => host
   }
