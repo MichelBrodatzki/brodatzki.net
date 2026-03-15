@@ -1,5 +1,5 @@
 {
-  "issuer": "https://raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1/",
+  "issuer": "https://raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1",
   "jwks_uri": "https://raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1/.well-known/jwks",
   "response_types_supported": [
     "id_token"

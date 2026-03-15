@@ -14,7 +14,7 @@ machine:
 cluster:
   apiServer:
     extraArgs:
-      service-account-issuer: "https://raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1/"
+      service-account-issuer: "https://raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1"
       service-account-jwks-uri: "https://raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1/.well-known/jwks"
   proxy:
     disabled: true
