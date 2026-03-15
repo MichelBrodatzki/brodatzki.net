@@ -83,6 +83,36 @@ else
 	aws s3api put-public-access-block --bucket "$tf_state_bucket_name" --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true" --profile "$aws_cli_profile"
 fi
 
+# Enforce HTTPS-only access on S3 Bucket
+https_only_policy='{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::'"$tf_state_bucket_name"'",
+        "arn:aws:s3:::'"$tf_state_bucket_name"'/*"
+      ],
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      }
+    }
+  ]
+}'
+
+existing_policy=$(aws s3api get-bucket-policy --bucket "$tf_state_bucket_name" --profile "$aws_cli_profile" 2>/dev/null | jq -r '.Policy // empty' 2>/dev/null || true)
+if echo "$existing_policy" | jq -e '.Statement[] | select(.Sid == "DenyInsecureTransport")' >/dev/null 2>&1; then
+	printf '\033[0;33m%s\033[0m\n' "WARNING: HTTPS-only bucket policy already exists. Skipping ..."
+else
+	printf '\033[0;32m%s\033[0m\n' "Enforcing HTTPS-only access on S3 bucket ..."
+	aws s3api put-bucket-policy --bucket "$tf_state_bucket_name" --policy "$https_only_policy" --profile "$aws_cli_profile"
+fi
+
 # Create GitHub IdP provider
 if aws iam list-open-id-connect-providers --profile "$aws_cli_profile" | jq -e '[.OpenIDConnectProviderList[].Arn] | any(. | endswith("token.actions.githubusercontent.com"))' >/dev/null 2>&1; then
 	printf '\033[0;33m%s\033[0m\n' "WARNING: GitHub OIDC provider already exists. Skipping creating ..."
