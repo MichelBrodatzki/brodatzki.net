@@ -28,7 +28,8 @@
                 "iam:AttachRolePolicy",
                 "iam:DetachRolePolicy",
                 "iam:ListAttachedRolePolicies",
-                "iam:ListRolePolicies"
+                "iam:ListRolePolicies",
+                "iam:UpdateAssumeRolePolicy"
             ],
             "Resource": "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly"
         },
