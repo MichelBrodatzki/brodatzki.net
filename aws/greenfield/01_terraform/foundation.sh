@@ -52,6 +52,27 @@ else
 	  }'
 fi
 
+# Configure S3 Bucket lifecycle policy to clean up old state file versions
+lifecycle_config='{
+  "Rules": [{
+    "ID": "cleanup-old-state-versions",
+    "Filter": {},
+    "Status": "Enabled",
+    "NoncurrentVersionExpiration": {
+      "NoncurrentDays": 14,
+      "NewerNoncurrentVersions": 5
+    }
+  }]
+}'
+
+existing_lifecycle=$(aws s3api get-bucket-lifecycle-configuration --bucket "$tf_state_bucket_name" --profile "$aws_cli_profile" 2>/dev/null || true)
+if echo "$existing_lifecycle" | jq -e '.Rules[] | select(.ID == "cleanup-old-state-versions")' >/dev/null 2>&1; then
+	printf '\033[0;33m%s\033[0m\n' "WARNING: Lifecycle policy for old state versions already exists. Skipping ..."
+else
+	printf '\033[0;32m%s\033[0m\n' "Adding lifecycle policy to expire old state versions after 14 days (keeping at least 5) ..."
+	aws s3api put-bucket-lifecycle-configuration --bucket "$tf_state_bucket_name" --lifecycle-configuration "$lifecycle_config" --no-cli-pager --profile "$aws_cli_profile"
+fi
+
 # Disable public access to S3 Bucket
 access_block_correctly_set=$(aws s3api get-public-access-block --bucket "$tf_state_bucket_name" --profile "$aws_cli_profile" | jq ".PublicAccessBlockConfiguration.BlockPublicAcls and .PublicAccessBlockConfiguration.IgnorePublicAcls and .PublicAccessBlockConfiguration.BlockPublicPolicy and .PublicAccessBlockConfiguration.RestrictPublicBuckets")
 
