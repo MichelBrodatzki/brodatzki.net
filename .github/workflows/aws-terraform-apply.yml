@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 jobs:
-  plan:
+  apply:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -38,7 +38,7 @@ jobs:
           files: |
             aws/**/*.tf
 
-      - name: Execute Terraform plan on changed folders
+      - name: Execute Terraform apply on changed folders
         env:
           ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
