@@ -30,6 +30,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "backups" {
     }
   }
   rule {
+    id     = "expire-old-objects"
+    status = "Enabled"
+    expiration {
+      days = 30
+    }
+  }
+  rule {
     id     = "abort-incomplete-uploads"
     status = "Enabled"
     abort_incomplete_multipart_upload {
