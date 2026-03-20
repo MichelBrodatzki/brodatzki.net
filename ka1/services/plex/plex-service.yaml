@@ -56,16 +56,8 @@ spec:
           volumeMounts:
             - name: plex-config
               mountPath: /config
-            - name: plex-movies
-              mountPath: /media/movies
-            - name: plex-series
-              mountPath: /media/series
-            - name: plex-musicvideos
-              mountPath: /media/musicvideos
-            - name: plex-music
-              mountPath: /media/music
-            - name: plex-test
-              mountPath: /media/test
+            - name: plex-audio
+              mountPath: /media/audio
           env:
             - name: TZ
               value: Europe/Berlin
@@ -74,23 +66,7 @@ spec:
         - name: plex-config
           persistentVolumeClaim:
             claimName: plex-config-pvc
-        - name: plex-movies
-          nfs:
-            server: storage1.ka1.brodatzki.network
-            path: "/mnt/pool1/media/Filme"
-        - name: plex-series
-          nfs:
-            server: storage1.ka1.brodatzki.network
-            path: "/mnt/pool1/media/Serien"
-        - name: plex-musicvideos
-          nfs:
-            server: storage1.ka1.brodatzki.network
-            path: "/mnt/pool1/media/Musikvideos"
-        - name: plex-music
-          nfs:
-            server: storage1.ka1.brodatzki.network
-            path: "/mnt/pool1/media/Musik"
-        - name: plex-test
-          nfs:
-            server: storage1.ka1.brodatzki.network
-            path: "/mnt/pool1/media/Testvideos"
+        - name: plex-audio
+          persistentVolumeClaim:
+            claimName: plex-audio-pvc
+
