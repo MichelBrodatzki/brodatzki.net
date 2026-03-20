@@ -58,8 +58,8 @@ spec:
             - "box1:media"
             - "local:/mnt/audio"
             - "--verbose"
-            - "--include 'Hörbücher/**"
-            - "--include 'Musik/**"
+            - "--include 'Hörbücher/**'"
+            - "--include 'Musik/**'"
             - "--delete-after"
             volumeMounts:
             - name: plex-audio-storage
