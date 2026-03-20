@@ -16,7 +16,7 @@ metadata:
   name: plex-audio-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   storageClassName: longhorn
   resources:
     requests:
