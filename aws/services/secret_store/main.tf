@@ -26,7 +26,8 @@ data "aws_iam_policy_document" "ka1_oidc_workload_assume_role" {
         "system:serviceaccount:mosquitto:mosquitto-secrets-sa",
         "system:serviceaccount:cert-manager:cert-manager-secrets-sa",
         "system:serviceaccount:n8n:n8n-secrets-sa",
-        "system:serviceaccount:paperless:paperless-secrets-sa"
+        "system:serviceaccount:paperless:paperless-secrets-sa",
+        "system:serviceaccount:plex:plex-secrets-sa"
       ]
     }
   }

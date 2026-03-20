@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: plex-secrets-sa
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: plex-secretstore
+spec:
+  provider:
+    aws:
+      service: ParameterStore
+      region: eu-central-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: plex-secrets-sa
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-plex-rclone-config
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: plex-secretstore
+    kind: SecretStore
+  target:
+    name: secret-plex-rclone-config
+  data:
+    - secretKey: file
+      remoteRef:
+        key: /ka1/plex/rclone-conf
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: plex-sync-audio-from-box1
+spec:
+  schedule: "0 3 * * *" 
+  concurrencyPolicy: Forbid 
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: rclone
+            image: rclone/rclone:latest
+            command:
+            - rclone
+            - sync
+            - "box1:media"
+            - "local:/mnt/audio"
+            - "--verbose"
+            - "--include 'Hörbücher/**"
+            - "--include 'Musik/**"
+            - "--delete-after"
+            volumeMounts:
+            - name: plex-audio-storage
+              mountPath: /mnt/audio
+            - name: plex-rclone-config-vol
+              mountPath: /config/rclone/rclone.conf
+              subPath: rclone.conf
+              readOnly: true
+          volumes:
+          - name: plex-audio-storage
+            persistentVolumeClaim:
+              claimName: plex-audio-pvc 
+          - name: plex-rclone-config-vol
+            secret:
+              secretName: secret-plex-rclone-config
+              items:
+                - key: file
+                  path: rclone.conf
