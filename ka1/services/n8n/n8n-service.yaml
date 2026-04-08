@@ -80,7 +80,7 @@ spec:
       hostname: n8n
       containers:
         - name: n8n
-          image: n8nio/n8n:2.14.2
+          image: n8nio/n8n:2.15.0
           securityContext:
             runAsUser: 0
           ports:
