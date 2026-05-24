@@ -13,4 +13,6 @@
         "/mnt/pool/media/audiobooks 10.10.40.100(ro) 10.10.40.110(ro)"
       ]);
   };
+
+  networking.firewall.allowedTCPPorts = [ 2049 ];
 }
