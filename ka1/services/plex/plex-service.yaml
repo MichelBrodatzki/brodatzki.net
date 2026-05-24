@@ -75,20 +75,20 @@ spec:
         - name: plex-movies
           nfs:
             server: 10.10.40.2
-            path: /mnt/pool/media/movies
+            path: /movies
             readOnly: true
         - name: plex-series
           nfs:
             server: 10.10.40.2
-            path: /mnt/pool/media/series
+            path: /series
             readOnly: true
         - name: plex-music
           nfs:
             server: 10.10.40.2
-            path: /mnt/pool/media/music
+            path: /music
             readOnly: true
         - name: plex-audiobooks
           nfs:
             server: 10.10.40.2
-            path: /mnt/pool/media/audiobooks
+            path: /audiobooks
             readOnly: true
