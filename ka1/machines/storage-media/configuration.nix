@@ -7,6 +7,7 @@
       ./locale.nix
       ./users.nix
       ./storage.nix
+      ./nfs.nix
     ];
 
   boot.loader.systemd-boot.enable = true;
