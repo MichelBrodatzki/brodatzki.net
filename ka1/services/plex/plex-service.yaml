@@ -56,8 +56,14 @@ spec:
           volumeMounts:
             - name: plex-config
               mountPath: /config
-            - name: plex-audio
-              mountPath: /media/audio
+            - name: plex-movies
+              mountPath: /media/movies
+            - name: plex-series
+              mountPath: /media/series
+            - name: plex-music
+              mountPath: /media/music
+            - name: plex-audiobooks
+              mountPath: /media/audiobooks
           env:
             - name: TZ
               value: Europe/Berlin
@@ -66,7 +72,23 @@ spec:
         - name: plex-config
           persistentVolumeClaim:
             claimName: plex-config-pvc
-        - name: plex-audio
-          persistentVolumeClaim:
-            claimName: plex-audio-pvc
-
+        - name: plex-movies
+          nfs:
+            server: 10.10.40.2
+            path: /mnt/pool/media/movies
+            readOnly: true
+        - name: plex-series
+          nfs:
+            server: 10.10.40.2
+            path: /mnt/pool/media/series
+            readOnly: true
+        - name: plex-music
+          nfs:
+            server: 10.10.40.2
+            path: /mnt/pool/media/music
+            readOnly: true
+        - name: plex-audiobooks
+          nfs:
+            server: 10.10.40.2
+            path: /mnt/pool/media/audiobooks
+            readOnly: true
