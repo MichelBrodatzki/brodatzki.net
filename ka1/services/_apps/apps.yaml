@@ -109,7 +109,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: n8n
+  name: wealthfolio
   namespace: argocd
 spec:
   syncPolicy:
@@ -119,7 +119,7 @@ spec:
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
     targetRevision: HEAD
-    path: ka1/services/n8n/
+    path: ka1/services/wealthfolio/
   destination:
     server: https://kubernetes.default.svc
-    namespace: n8n
+    namespace: wealthfolio
