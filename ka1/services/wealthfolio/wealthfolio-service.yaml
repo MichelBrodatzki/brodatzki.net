@@ -80,7 +80,7 @@ spec:
       hostname: wealthfolio
       containers:
         - name: wealthfolio
-          image: ghcr.io/wealthfolio/wealthfolio:3.4.0
+          image: ghcr.io/wealthfolio/wealthfolio:3.5.0
           securityContext:
             runAsUser: 0
           ports:
