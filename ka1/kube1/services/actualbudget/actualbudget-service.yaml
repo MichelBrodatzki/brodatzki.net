@@ -19,8 +19,8 @@ spec:
   type: ClusterIP
   ports:
     - name: http
-      port: 8088
-      targetPort: 8088
+      port: 5006
+      targetPort: 5006
   selector:
     app: actualbudget
 ---
