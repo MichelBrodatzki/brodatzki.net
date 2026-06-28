@@ -63,7 +63,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: traefik-tunnel-config-provider
-          image: ghcr.io/michelbrodatzki/traefik-tunnel-config-provider/traefik-tunnel-config-provider:sha256-3741330fb4e9b9640a4dbfd06029b9e550c939cfe0abd2c93b84d80ab0b1fbe4
+          image: ghcr.io/michelbrodatzki/traefik-tunnel-config-provider/traefik-tunnel-config-provider:main
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
