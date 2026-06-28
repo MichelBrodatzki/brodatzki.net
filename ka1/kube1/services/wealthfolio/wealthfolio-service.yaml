@@ -78,11 +78,21 @@ spec:
         app: wealthfolio
     spec:
       hostname: wealthfolio
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: wealthfolio
           image: ghcr.io/wealthfolio/wealthfolio:3.5.3
           securityContext:
-            runAsUser: 0
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           ports:
             - containerPort: 8088
           volumeMounts:

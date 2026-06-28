@@ -39,11 +39,21 @@ spec:
         app: actualbudget
     spec:
       hostname: actualbudget
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: actualbudget
           image: ghcr.io/actualbudget/actual:26.6.0-alpine
           securityContext:
-            runAsUser: 0
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           ports:
             - containerPort: 5006
           volumeMounts:
