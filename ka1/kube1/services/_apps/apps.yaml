@@ -1,6 +1,31 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: traefik-tunnel-config-provider
+  namespace: argocd
+spec:
+  syncPolicy:
+    automated:
+      enabled: true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: restricted
+        pod-security.kubernetes.io/warn: restricted
+        pod-security.kubernetes.io/audit: restricted
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: HEAD
+    path: ka1/kube1/services/traefik-tunnel-config-provider/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: traefik-tunnel-config-provider
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   name: plex
   namespace: argocd
 spec:
