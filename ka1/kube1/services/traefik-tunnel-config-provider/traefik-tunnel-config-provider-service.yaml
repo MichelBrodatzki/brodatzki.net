@@ -65,6 +65,7 @@ spec:
       containers:
         - name: traefik-tunnel-config-provider
           image: ghcr.io/michelbrodatzki/traefik-tunnel-config-provider/traefik-tunnel-config-provider:main
+          imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
