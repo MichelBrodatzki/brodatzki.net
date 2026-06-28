@@ -59,6 +59,23 @@ kind: CiliumLoadBalancerIPPool
 metadata:
   name: "cilium-lb-pool"
 spec:
+  # Dynamic pool: auto-assigned to any LoadBalancer Service that does not
+  # request a specific IP. No serviceSelector => matches all services.
   blocks:
   - start: "10.10.41.1"
     stop: "10.10.41.200"
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "cilium-lb-pool-reserved"
+spec:
+  # Reserved pool for services with a pinned spec.loadBalancerIP
+  # (exdns .254, homeassistant sonos .253, mosquitto .252).
+  # The serviceSelector ensures dynamic services cannot draw from this range.
+  serviceSelector:
+    matchLabels:
+      lb-pool: reserved
+  blocks:
+  - start: "10.10.41.201"
+    stop: "10.10.41.254"

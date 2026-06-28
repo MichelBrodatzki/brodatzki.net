@@ -35,6 +35,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mosquitto-tcp-ingress
+  labels:
+    lb-pool: reserved
 spec:
   type: LoadBalancer
   loadBalancerIP: 10.10.41.252
