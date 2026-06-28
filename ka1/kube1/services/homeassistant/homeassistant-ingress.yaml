@@ -3,7 +3,8 @@ kind: Gateway
 metadata:
   name: homeassistant-https-gateway
   annotations:
-    cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod" 
+    cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod"
+    brodatzki.net/enable-public-tunnel: "true"
 spec:
   gatewayClassName: cilium
   listeners:
