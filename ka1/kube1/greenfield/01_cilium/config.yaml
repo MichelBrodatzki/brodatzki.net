@@ -61,4 +61,4 @@ metadata:
 spec:
   blocks:
   - start: "10.10.41.1"
-    stop: "10.10.41.254"
+    stop: "10.10.41.200"
