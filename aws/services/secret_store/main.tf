@@ -23,6 +23,7 @@ data "aws_iam_policy_document" "ka1_oidc_workload_assume_role" {
       test     = "StringEquals"
       variable = "${aws_iam_openid_connect_provider.ka1_oidc.url}:sub"
       values = [
+        "system:serviceaccount:longhorn-system:longhorn-secrets-sa",
         "system:serviceaccount:mosquitto:mosquitto-secrets-sa",
         "system:serviceaccount:cert-manager:cert-manager-secrets-sa",
         "system:serviceaccount:n8n:n8n-secrets-sa",
