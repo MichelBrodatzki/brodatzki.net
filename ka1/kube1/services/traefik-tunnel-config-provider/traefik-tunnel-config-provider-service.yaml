@@ -4,7 +4,7 @@ kind: ServiceAccount
 metadata:
   name: traefik-tunnel-config-provider
 ---
-apiVersion: rbac.auttrahorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: traefik-tunnel-config-provider-gateway-reader
