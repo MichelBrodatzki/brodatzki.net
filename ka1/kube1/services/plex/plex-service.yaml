@@ -11,18 +11,6 @@ spec:
       storage: 32Gi
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: plex-audio-pvc
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 100Gi
----
-apiVersion: v1
 kind: Service
 metadata:
   name: plex
