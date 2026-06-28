@@ -7,6 +7,52 @@ metadata:
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: longhorn-secrets-sa
+  namespace: longhorn-system
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: longhorn-secretstore
+  namespace: longhorn-system
+spec:
+  provider:
+    aws:
+      service: ParameterStore
+      region: eu-central-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: longhorn-secrets-sa
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-longhorn-backup-secret
+  namespace: longhorn-system
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: longhorn-secretstore
+    kind: SecretStore
+  target:
+    name: secret-backup-longhorn
+  data:
+    - secretKey: AWS_SECRET_ACCESS_KEY
+      remoteRef:
+        key: /ka1/longhorn/backblaze_application_key
+    - secretKey: AWS_ACCESS_KEY_ID
+      remoteRef:
+        key: /ka1/longhorn/backblaze_key_id
+    - secretKey: AWS_ENDPOINTS
+      remoteRef:
+        key: /ka1/longhorn/backblaze_endpoint
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -26,7 +72,13 @@ spec:
           preUpgradeChecker:
             jobEnabled: false
           defaultBackupStore:
-            backupTarget: "nfs://storage1.ka1.brodatzki.network:/mnt/pool1/backups/kube1"
+            backupTarget: "s3://brodatzkinet-ka1@s3.eu-central-003.backblazeb2.com/longhorn/"
+            backupTargetCredentialSecret: secret-backup-longhorn
+            pollInterval: 0
+          defaultSettings:
+            defaultReplicaCount: 1
+          persistence:
+            defaultClassReplicaCount: 1
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
@@ -60,3 +112,42 @@ spec:
       kind: CustomResourceDefinition
       name: volumes.longhorn.io
       jsonPointers: ["/spec/preserveUnknownFields"]
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: daily-backup
+  namespace: longhorn-system
+spec:
+  cron: "0 3 * * *"
+  task: "backup"
+  groups:
+  - default
+  retain: 7
+  concurrency: 1
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: weekly-backup
+  namespace: longhorn-system
+spec:
+  cron: "0 4 * * 0"
+  task: "backup"
+  groups:
+  - default
+  retain: 4
+  concurrency: 1
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: monthly-backup
+  namespace: longhorn-system
+spec:
+  cron: "0 5 1 * *"
+  task: "backup"
+  groups:
+  - default
+  retain: 6
+  concurrency: 1
