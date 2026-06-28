@@ -24,6 +24,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: traefik-tunnel-config-provider
+    namespace: traefik-tunnel-config-provider
 ---
 apiVersion: v1
 kind: Service
