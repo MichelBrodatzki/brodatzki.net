@@ -1,31 +1,63 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openwebui-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: openwebui
-  namespace: argocd
 spec:
-  syncPolicy:
-    syncOptions:
-      - CreateNamespace=true
-  project: default
-  sources:
-    - chart: open-webui
-      repoURL: https://open-webui.github.io/helm-charts
-      targetRevision: v0.10.1
-      helm:
-        values: |
-          ollama:
-            enabled: false
-          route:
-            enabled: true
-            annotations:
-              cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod"
-            hostnames:
-              - openwebui.ka1.brodatzki.net
-            parentRefs:
-              - openwebui-https-gateway
-          persistence:
-            storageClass: longhorn
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: openwebui
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openwebui
+  template:
+    metadata:
+      labels:
+        app: openwebui
+    spec:
+      hostname: openwebui
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: openwebui
+          image: ghcr.io/open-webui/open-webui:v0.10.1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: openwebui-data
+              mountPath: /app/backend/data
+          imagePullPolicy: Always
+          env:
+            - name: WEBUI_URL
+              value: https://openwebui.ka1.brodatzki.net
+            - name: DEFAULT_USER_ROLE
+              value: pending
+            - name: ENABLE_CHANNELS
+              value: 'True'
+            - name: ENABLE_OLLAMA_API
+              value: 'False'
+            - name: ENABLE_IMAGE_GENERATION
+              value: 'True'
+      volumes:
+        - name: openwebui-data
+          persistentVolumeClaim:
+            claimName: openwebui-data-pvc
