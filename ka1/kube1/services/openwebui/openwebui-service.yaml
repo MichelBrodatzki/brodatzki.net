@@ -9,7 +9,7 @@ spec:
       - CreateNamespace=true
   project: default
   sources:
-    - chart: open-webui/open-webui
+    - chart: open-webui
       repoURL: https://open-webui.github.io/helm-charts
       targetRevision: v0.10.1
       helm:
