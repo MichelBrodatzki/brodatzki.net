@@ -10,6 +10,19 @@ spec:
     requests:
       storage: 2Gi
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openwebui
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: openwebui
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
