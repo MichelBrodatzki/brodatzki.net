@@ -38,21 +38,9 @@ spec:
         app: openwebui
     spec:
       hostname: openwebui
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        seccompProfile:
-          type: RuntimeDefault
       containers:
         - name: openwebui
           image: ghcr.io/open-webui/open-webui:v0.10.1
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
           ports:
             - containerPort: 8080
           volumeMounts:
