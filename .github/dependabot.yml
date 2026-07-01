@@ -2,11 +2,12 @@ version: 2
 updates:
   - package-ecosystem: "docker"
     directories:
+      - "/ka1/kube1/services/actualbudget"
       - "/ka1/kube1/services/homeassistant"
       - "/ka1/kube1/services/mosquitto"
-      - "/ka1/kube1/services/wealthfolio"
+      - "/ka1/kube1/services/openwebui"
       - "/ka1/kube1/services/plex"
+      - "/ka1/kube1/services/wealthfolio"
       - "/ka1/kube1/services/zigbee2mqtt"
-      - "/ka1/kube1/services/actualbudget"
     schedule:
       interval: "daily"
