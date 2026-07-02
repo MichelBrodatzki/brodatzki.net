@@ -1,6 +1,8 @@
 { config, ... }:
 
 {
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
+
   security.acme.acceptTerms = true;
   security.acme.defaults.email = "michel+acme@brodatzki.com";
 

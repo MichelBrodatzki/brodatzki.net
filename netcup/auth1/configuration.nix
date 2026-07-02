@@ -13,7 +13,8 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "auth1.netcup.brodatzki.network";
+  networking.hostName = "auth1";
+  networking.domain = "netcup.brodatzki.network";
   networking.networkmanager.enable = true;
 
   services.openssh = {

@@ -1,6 +1,7 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 
 {
+  services.kanidm.package = pkgs.kanidm_1_10;
   services.kanidm.server = {
     enable = true;
 
