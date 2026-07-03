@@ -1,9 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kanidm-gateway-tls
+spec:
+  secretName: kanidm-gateway-tls
+  issuerRef:
+    name: clusterissuer-cloudflare-acme-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - brodatzki.id
+    - ka1.brodatzki.id
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: kanidm-https-gateway
-  annotations:
-    cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod" 
 spec:
   gatewayClassName: cilium
   infrastructure:
@@ -13,30 +24,28 @@ spec:
     - type: IPAddress
       value: 10.10.41.251
   listeners:
-    - name: https-base
-      protocol: HTTPS
+    - name: tls-base
+      protocol: TLS
       port: 443
       hostname: "brodatzki.id"
       tls:
-        mode: Terminate
-        certificateRefs:
-        - kind: Secret
-          name: kanidm-gateway-tls
+        mode: Passthrough
       allowedRoutes:
         namespaces:
           from: Same
-    - name: https-site
-      protocol: HTTPS
+        kinds:
+          - kind: TLSRoute
+    - name: tls-site
+      protocol: TLS
       port: 443
       hostname: "ka1.brodatzki.id"
       tls:
-        mode: Terminate
-        certificateRefs:
-        - kind: Secret
-          name: kanidm-gateway-tls
+        mode: Passthrough
       allowedRoutes:
         namespaces:
           from: Same
+        kinds:
+          - kind: TLSRoute
     - name: http-base
       protocol: HTTP
       port: 80
@@ -72,24 +81,20 @@ spec:
           scheme: https
           statusCode: 301
 ---
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
 metadata:
   name: kanidm-service-route
 spec:
   parentRefs:
     - name: kanidm-https-gateway
-      sectionName: https-base
+      sectionName: tls-base
     - name: kanidm-https-gateway
-      sectionName: https-site
+      sectionName: tls-site
   hostnames:
     - "brodatzki.id"
     - "ka1.brodatzki.id"
   rules:
-    - matches:
-      - path:
-          type: PathPrefix
-          value: /
-      backendRefs:
+    - backendRefs:
         - name: kanidm
           port: 8443
