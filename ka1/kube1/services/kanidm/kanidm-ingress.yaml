@@ -6,6 +6,9 @@ metadata:
     cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod" 
 spec:
   gatewayClassName: cilium
+  infrastructure:
+    labels:
+      lb-pool: reserved
   addresses:
     - type: IPAddress
       value: 10.10.41.251
