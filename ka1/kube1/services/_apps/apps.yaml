@@ -222,3 +222,28 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: openwebui
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kanidm
+  namespace: argocd
+spec:
+  syncPolicy:
+    automated:
+      enabled: true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: baseline
+        pod-security.kubernetes.io/warn: restricted
+        pod-security.kubernetes.io/audit: restricted
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: HEAD
+    path: ka1/kube1/services/kanidm/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kanidm
