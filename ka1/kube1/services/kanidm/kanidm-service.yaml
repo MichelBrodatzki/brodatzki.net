@@ -44,10 +44,10 @@ data:
     [replication]
     origin = "repl://ka1.brodatzki.id:8444"
     bindaddress = "127.0.0.1:8444"
-    
+
     [replication."repl://core.brodatzki.id:8444"]
     type = "pull"
-    supplier_cert = "AAAAAAAAAAA"
+    supplier_cert = "MIIB2TCCAX-gAwIBAgIRAaSKMJqJHEjQm4kt9tsSnDwwCgYIKoZIzj0EAwIwTDEtMCsGA1UEAwwkYTQ4YTMwOWEtODkxYy00OGQwLTliODktMmRmNmRiMTI5YzNjMRswGQYDVQQKDBJLYW5pZG0gUmVwbGljYXRpb24wHhcNMjYwNzAzMTc1ODE2WhcNMzAwNzAzMTc1ODE2WjBMMS0wKwYDVQQDDCRhNDhhMzA5YS04OTFjLTQ4ZDAtOWI4OS0yZGY2ZGIxMjljM2MxGzAZBgNVBAoMEkthbmlkbSBSZXBsaWNhdGlvbjBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABIqzqGgU4ZeXwd-nO0JT3IUrk5nKLQmC7juGwFfSzSi4FLLV3EEMxItaV8E5FMXDAYS4-fjFbghuyQ-HQ1eUwdyjQjBAMCAGA1UdJQEB_wQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATAcBgNVHREEFTATghFjb3JlLmJyb2RhdHpraS5pZDAKBggqhkjOPQQDAgNIADBFAiEAzxAPPqaFtmnBQZd_kdqdnEZ2roKk112aXImMLxvjklcCIDyv2B_9CbnRAVJgMLF89DqRlpb7vvv4w6zTbQMmob6O"
     automatic_refresh = true
 ---
 apiVersion: apps/v1
