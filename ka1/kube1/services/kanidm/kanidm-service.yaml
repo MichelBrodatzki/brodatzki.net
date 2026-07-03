@@ -17,8 +17,7 @@ metadata:
   labels:
     lb-pool: reserved
 spec:
-  type: LoadBalancer
-  loadBalancerIP: 10.10.41.251
+  type: ClusterIP
   ports:
     - name: kanidm
       port: 8443
