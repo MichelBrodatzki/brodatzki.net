@@ -64,7 +64,7 @@ spec:
       sectionName: http-site
   hostnames:
     - "brodatzki.id"
-    - "core.brodatzki.id"
+    - "ka1.brodatzki.id"
   rules:
     - filters:
       - type: RequestRedirect
