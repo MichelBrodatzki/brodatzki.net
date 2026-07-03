@@ -19,11 +19,6 @@
       replication = {
         origin = "repl://core.brodatzki.id:8444";
         bindaddress = "0.0.0.0:8444";
-
-        "repl://ka1.brodatzki.id:8444" = {
-          type = "allow-pull";
-          consumer_cert = "AAAAAAAAAAAA";
-        };
       };
     };
   };
