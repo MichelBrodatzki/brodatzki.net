@@ -35,9 +35,8 @@ data:
     version = "2"
     
     bindaddress = "0.0.0.0:8443"
-    adminbindpath = "/tmp/kanidm-admin.sock"
 
-    db_path = "/db/kanidm.db"
+    db_path = "/data/kanidm.db"
 
     tls_chain = "/var/lib/kanidm/tls.crt"
     tls_key = "/var/lib/kanidm/tls.key"
@@ -67,9 +66,11 @@ spec:
             - containerPort: 8443
           volumeMounts:
             - name: kanidm-data
-              mountPath: /db
-            - name: kanidm-config
               mountPath: /data
+            - name: kanidm-config
+              subPath: server.toml
+              mountPath: /data/server.toml
+              readOnly: true
             - name: kanidm-certs
               mountPath: /var/lib/kanidm
               readOnly: true
