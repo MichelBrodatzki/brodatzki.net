@@ -30,7 +30,8 @@ metadata:
 data:
   server.toml: |
     version = "2"
-    
+    role = "read_only_replica"
+
     bindaddress = "0.0.0.0:8443"
 
     db_path = "/data/kanidm.db"
