@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kanidm-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kanidm-ingress
+  labels:
+    lb-pool: reserved
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.10.41.251
+  ports:
+    - name: kanidm
+      port: 8443
+      targetPort: 8443
+  selector:
+    app: kanidm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kanidm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kanidm
+  template:
+    metadata:
+      labels:
+        app: kanidm
+    spec:
+      hostname: kanidm
+      containers:
+        - name: kanidm
+          image: docker.io/kanidm/server:1.10.4
+          ports:
+            - containerPort: 8443
+          env:
+            - name: KANIDM_DOMAIN
+              value: "brodatzki.id"
+            - name: KANIDM_ORIGIN
+              value: "https://brodatzki.id"
+            - name: KANIDM_TLS_CHAIN
+              value: "/var/lib/kanidm/tls.crt"
+            - name: KANIDM_TLS_KEY
+              value: "/var/lib/kanidm/tls.key"
+          volumeMounts:
+            - name: kanidm-data
+              mountPath: /data
+            - name: kanidm-certs
+              mountPath: /var/lib/kanidm
+              readOnly: true
+          imagePullPolicy: Always
+      volumes:
+        - name: kanidm-data
+          persistentVolumeClaim:
+            claimName: kanidm-data-pvc
+        - name: kanidm-certs
+          secret:
+            secretName: kanidm-gateway-tls
