@@ -19,6 +19,11 @@
       replication = {
         origin = "repl://core.brodatzki.id:8444";
         bindaddress = "0.0.0.0:8444";
+
+        "repl://ka1.brodatzki.id:8444" = {
+          type = "allow-pull";
+          consumer_cert = "MIIB2DCCAX6gAwIBAgIRAXFMxmhzRE5xm9H7387lFuUwCgYIKoZIzj0EAwIwTDEtMCsGA1UEAwwkNzE0Y2M2NjgtNzM0NC00ZTcxLTliZDEtZmJkZmNlZTUxNmU1MRswGQYDVQQKDBJLYW5pZG0gUmVwbGljYXRpb24wHhcNMjYwNzAzMTgwMDMzWhcNMzAwNzAzMTgwMDMzWjBMMS0wKwYDVQQDDCQ3MTRjYzY2OC03MzQ0LTRlNzEtOWJkMS1mYmRmY2VlNTE2ZTUxGzAZBgNVBAoMEkthbmlkbSBSZXBsaWNhdGlvbjBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABDZAQnNr-biNaTSQvF8RPcoopJJ6taVjwa1_k4TL9BXjnaIeKG21AbiuC64FBNt0-i26h1hMBY9oDkBlut1q6qajQTA_MCAGA1UdJQEB_wQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATAbBgNVHREEFDASghBrYTEuYnJvZGF0emtpLmlkMAoGCCqGSM49BAMCA0gAMEUCIQCT1dQJ6-zIc6sqTLB9equhJp7Ovi5I5B-XwrpwKwRZ3gIgb1fJG1asJ1ZfQI15bQ1gG-Uo66hCQFgCUsSkQ9NzE3s";
+        };
       };
     };
   };
