@@ -33,7 +33,9 @@ metadata:
 data:
   server.toml: |
     version = "2"
+    
     bindaddress = "0.0.0.0:8443"
+    adminbindpath = "/tmp/kanidm-admin.sock"
 
     db_path = "/db/kanidm.db"
 
