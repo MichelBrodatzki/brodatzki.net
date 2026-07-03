@@ -23,8 +23,8 @@
         "repl://ka1.brodatzki.id:8444" = {
           type = "allow-pull";
           consumer_cert = "AAAAAAAAAAAA";
-        }
-      }
+        };
+      };
     };
   };
 
