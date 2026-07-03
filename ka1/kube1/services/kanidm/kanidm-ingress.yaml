@@ -126,4 +126,4 @@ spec:
       sectionName: kanidm
   validation:
     hostname: brodatzki.id
-    wellKnownCACerts: System
+    wellKnownCACertificates: System
