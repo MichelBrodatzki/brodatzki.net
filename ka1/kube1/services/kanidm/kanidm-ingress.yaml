@@ -53,7 +53,9 @@ metadata:
 spec:
   parentRefs:
     - name: kanidm-https-gateway
-      sectionName: http
+      sectionName: http-base
+    - name: kanidm-https-gateway
+      sectionName: http-site
   hostnames:
     - "brodatzki.id"
     - "core.brodatzki.id"
@@ -71,7 +73,9 @@ metadata:
 spec:
   parentRefs:
     - name: kanidm-https-gateway
-      sectionName: https
+      sectionName: https-base
+    - name: kanidm-https-gateway
+      sectionName: https-site
   hostnames:
     - "brodatzki.id"
     - "ka1.brodatzki.id"
