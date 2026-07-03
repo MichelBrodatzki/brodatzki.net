@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
 {
+  networking.firewall.allowedTCPPorts = [ 8444 ];
+
   services.kanidm.package = pkgs.kanidm_1_10;
   services.kanidm.server = {
     enable = true;
@@ -13,6 +15,16 @@
 
       tls_chain = "/var/lib/kanidm/cert.pem";
       tls_key = "/var/lib/kanidm/key.pem";
+
+      replication = {
+        origin = "repl://core.brodatzki.id:8444";
+        bindaddress = "0.0.0.0:8444";
+
+        "repl://ka1.brodatzki.id:8444" = {
+          type = "allow-pull";
+          consumer_cert = "AAAAAAAAAAAA";
+        }
+      }
     };
   };
 
