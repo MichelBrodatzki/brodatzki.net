@@ -124,7 +124,7 @@ spec:
             - name: ACTUAL_OPENID_ENFORCE
               value: "true"
             - name: ACTUAL_TOKEN_EXPIRATION
-              value: "openid-provider"
+              value: "never"
           imagePullPolicy: Always
       volumes:
         - name: actualbudget-data
