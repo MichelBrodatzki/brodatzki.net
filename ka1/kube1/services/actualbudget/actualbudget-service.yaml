@@ -1,3 +1,45 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: actualbudget-secrets-sa
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: actualbudget-secretstore
+spec:
+  provider:
+    aws:
+      service: ParameterStore
+      region: eu-central-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: actualbudget-secrets-sa
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-actualbudget-oidc
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: actualbudget-secretstore
+    kind: SecretStore
+  target:
+    name: secret-actualbudget-oidc
+  data:
+    - secretKey: discovery
+      remoteRef:
+        key: /ka1/actualbudget/oidc/discovery
+    - secretKey: client_id
+      remoteRef:
+        key: /ka1/actualbudget/oidc/client_id
+    - secretKey: client_secret
+      remoteRef:
+        key: /ka1/actualbudget/oidc/client_secret
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -59,6 +101,30 @@ spec:
           volumeMounts:
             - name: actualbudget-data
               mountPath: /data
+          env:
+            - name: ACTUAL_OPENID_DISCOVERY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: secret-actualbudget-oidc
+                  key: discovery
+            - name: ACTUAL_OPENID_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: secret-actualbudget-oidc
+                  key: client_id
+            - name: ACTUAL_OPENID_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secret-actualbudget-oidc
+                  key: client_secret
+            - name: ACTUAL_OPENID_SERVER_HOSTNAME
+              value: actualbudget.ka1.brodatzki.net
+            - name: ACTUAL_USER_CREATION_MODE
+              value: "login"
+            - name: ACTUAL_OPENID_ENFORCE
+              value: "true"
+            - name: ACTUAL_TOKEN_EXPIRATION
+              value: "openid-provider"
           imagePullPolicy: Always
       volumes:
         - name: actualbudget-data
