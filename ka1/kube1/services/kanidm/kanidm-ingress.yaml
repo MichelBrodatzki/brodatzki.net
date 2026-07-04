@@ -99,17 +99,26 @@ spec:
   rules:
     - matches:
         - path:
+            type: Exact
+            value: /ui/profile
+        - path:
+            type: Exact
+            value: /ui/update_credentials
+        - path:
             type: PathPrefix
-            value: /ui
+            value: /ui/reset
+        - path:
+            type: Exact
+            value: /ui/enrol
+        - path:
+            type: Exact
+            value: /ui/radius
         - path:
             type: PathPrefix
             value: /v1
         - path:
             type: PathPrefix
             value: /scim/v1
-        - path:
-            type: Exact
-            value: /
       filters:
         - type: RequestRedirect
           requestRedirect:
