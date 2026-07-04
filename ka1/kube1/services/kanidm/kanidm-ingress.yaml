@@ -102,6 +102,9 @@ spec:
             type: PathPrefix
             value: /ui
         - path:
+            type: PathPrefix
+            value: /v1
+        - path:
             type: Exact
             value: /
       filters:
