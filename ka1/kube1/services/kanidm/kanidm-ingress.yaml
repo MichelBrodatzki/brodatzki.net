@@ -105,6 +105,9 @@ spec:
             type: PathPrefix
             value: /v1
         - path:
+            type: PathPrefix
+            value: /scim/v1
+        - path:
             type: Exact
             value: /
       filters:
