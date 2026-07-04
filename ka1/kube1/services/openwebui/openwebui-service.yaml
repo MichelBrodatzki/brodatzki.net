@@ -146,6 +146,8 @@ spec:
               value: 'user,admin'
             - name: OAUTH_ADMIN_ROLES
               value: 'admin'
+            - name: OAUTH_CODE_CHALLENGE_METHOD
+              value: 'S256'
       volumes:
         - name: openwebui-data
           persistentVolumeClaim:
