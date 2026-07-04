@@ -110,9 +110,6 @@ spec:
             scheme: https
             hostname: core.brodatzki.id
             statusCode: 302
-    - backendRefs:
-        - name: kanidm
-          port: 8443
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
