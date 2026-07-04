@@ -94,6 +94,8 @@ spec:
               mountPath: /app/backend/data
           imagePullPolicy: Always
           env:
+            - name: CORS_ALLOW_ORIGIN
+              value: https://openwebui.ka1.brodatzki.net
             - name: WEBUI_URL
               value: https://openwebui.ka1.brodatzki.net
             - name: DEFAULT_USER_ROLE
