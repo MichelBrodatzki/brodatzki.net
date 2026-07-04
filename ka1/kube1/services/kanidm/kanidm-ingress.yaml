@@ -122,6 +122,7 @@ spec:
     - group: ""
       kind: Service
       name: kanidm
+      sectionName: kanidm
   validation:
-    hostname: brodatzki.id
+    hostname: ka1.brodatzki.id
     wellKnownCACertificates: System
