@@ -107,7 +107,6 @@ spec:
       filters:
         - type: RequestRedirect
           requestRedirect:
-            scheme: https
             hostname: core.brodatzki.id
             statusCode: 302
 ---
