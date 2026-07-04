@@ -4,7 +4,7 @@ helm repo add cilium https://helm.cilium.io/
 helm upgrade --install \
     cilium \
     cilium/cilium \
-    --version 1.19.5 \
+    --version 1.20.0-pre.3 \
     --namespace kube-system \
     --set ipam.mode=kubernetes \
     --set=kubeProxyReplacement=true \
