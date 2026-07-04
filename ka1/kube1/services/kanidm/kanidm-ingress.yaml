@@ -125,4 +125,7 @@ spec:
       sectionName: kanidm
   validation:
     hostname: ka1.brodatzki.id
-    wellKnownCACertificates: System
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: kanidm-backend-ca
