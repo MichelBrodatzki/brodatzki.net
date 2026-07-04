@@ -30,7 +30,6 @@ metadata:
 data:
   server.toml: |
     version = "2"
-    role = "WriteReplicaNoUI"
 
     bindaddress = "0.0.0.0:8443"
 
