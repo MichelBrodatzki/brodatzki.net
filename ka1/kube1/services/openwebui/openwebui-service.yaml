@@ -31,7 +31,7 @@ spec:
   target:
     name: secret-openwebui-oidc
   data:
-    - secretKey: webUiKey
+    - secretKey: webui_key
       remoteRef:
         key: /ka1/openwebui/webuikey
     - secretKey: discovery
@@ -118,7 +118,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: secret-openwebui-oidc
-                  key: webuikey
+                  key: webui_key
             - name: OPENID_PROVIDER_URL
               valueFrom:
                 secretKeyRef:
