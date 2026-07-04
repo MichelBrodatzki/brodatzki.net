@@ -118,7 +118,7 @@ spec:
                   name: secret-actualbudget-oidc
                   key: client_secret
             - name: ACTUAL_OPENID_SERVER_HOSTNAME
-              value: actualbudget.ka1.brodatzki.net
+              value: https://actualbudget.ka1.brodatzki.net
             - name: ACTUAL_USER_CREATION_MODE
               value: "login"
             - name: ACTUAL_OPENID_ENFORCE
