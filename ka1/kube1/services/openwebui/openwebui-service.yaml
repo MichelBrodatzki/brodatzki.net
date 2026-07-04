@@ -1,4 +1,50 @@
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: openwebui-secrets-sa
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: openwebui-secretstore
+spec:
+  provider:
+    aws:
+      service: ParameterStore
+      region: eu-central-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: openwebui-secrets-sa
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-openwebui-oidc
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: openwebui-secretstore
+    kind: SecretStore
+  target:
+    name: secret-openwebui-oidc
+  data:
+    - secretKey: webUiKey
+      remoteRef:
+        key: /ka1/openwebui/webuikey
+    - secretKey: discovery
+      remoteRef:
+        key: /ka1/openwebui/oidc/discovery
+    - secretKey: client_id
+      remoteRef:
+        key: /ka1/openwebui/oidc/client_id
+    - secretKey: client_secret
+      remoteRef:
+        key: /ka1/openwebui/oidc/client_secret
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: openwebui-data-pvc
@@ -58,6 +104,48 @@ spec:
               value: 'False'
             - name: ENABLE_IMAGE_GENERATION
               value: 'True'
+            - name: ENABLE_OAUTH_SIGNUP
+              value: 'True'
+            - name: OAUTH_AUTO_REDIRECT
+              value: 'True'
+            - name: ENABLE_LOGIN_FORM
+              value: 'False'
+            - name: OAUTH_MERGE_ACCOUNTS_BY_EMAIL
+              value: 'True'
+            - name: ENABLE_OAUTH_ID_TOKEN_COOKIE
+              value: 'False'
+            - name: WEBUI_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openwebui-oidc
+                  key: webuikey
+            - name: OPENID_PROVIDER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openwebui-oidc
+                  key: discovery
+            - name: OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openwebui-oidc
+                  key: client_id
+            - name: OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openwebui-oidc
+                  key: client_secret
+            - name: OAUTH_PROVIDER_NAME
+              value: 'Brodatzki ID'
+            - name: OPENID_REDIRECT_URI
+              value: 'https://openwebui.ka1.brodatzki.net/oauth/oidc/callback'
+            - name: ENABLE_OAUTH_ROLE_MANAGEMENT
+              value: 'True'
+            - name: OAUTH_ROLES_CLAIM
+              value: 'account_role'
+            - name: OAUTH_ALLOWED_ROLES
+              value: 'user,admin'
+            - name: OAUTH_ADMIN_ROLES
+              value: 'admin'
       volumes:
         - name: openwebui-data
           persistentVolumeClaim:
