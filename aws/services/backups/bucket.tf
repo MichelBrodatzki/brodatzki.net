@@ -22,6 +22,10 @@ resource "aws_s3_bucket_versioning" "backups_versioned" {
 
 resource "aws_s3_bucket_lifecycle_configuration" "backups" {
   bucket = aws_s3_bucket.backups.id
+
+  # Garbage-collect noncurrent versions bucket-wide. For the CNPG prefix this
+  # only removes versions CNPG has already deleted via its own 14d
+  # retentionPolicy, so it can never break a live restore chain.
   rule {
     id     = "expire-old-versions"
     status = "Enabled"
@@ -29,13 +33,18 @@ resource "aws_s3_bucket_lifecycle_configuration" "backups" {
       noncurrent_days = 30
     }
   }
+
   rule {
-    id     = "expire-old-objects"
+    id     = "expire-old-objects-host-backups"
     status = "Enabled"
+    filter {
+      prefix = "vps1_netcup_brodatzki_network/"
+    }
     expiration {
       days = 30
     }
   }
+
   rule {
     id     = "abort-incomplete-uploads"
     status = "Enabled"
