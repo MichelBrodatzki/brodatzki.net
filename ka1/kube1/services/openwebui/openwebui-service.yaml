@@ -98,8 +98,11 @@ spec:
               value: https://openwebui.ka1.brodatzki.net
             - name: WEBUI_URL
               value: https://openwebui.ka1.brodatzki.net
-            - name: DEFAULT_USER_ROLE
-              value: pending
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-openwebui-app
+                  key: uri
             - name: ENABLE_CHANNELS
               value: 'True'
             - name: ENABLE_OLLAMA_API
