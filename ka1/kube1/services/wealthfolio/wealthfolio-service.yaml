@@ -53,7 +53,7 @@ spec:
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: externalsecret-wealthfolio-secrets
+  name: externalsecret-wealthfolio-oidc-secrets
 spec:
   refreshPolicy: CreatedOnce
   secretStoreRef:
