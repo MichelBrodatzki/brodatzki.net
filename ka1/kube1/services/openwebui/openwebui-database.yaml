@@ -8,7 +8,6 @@ spec:
     size: 1Gi
   serviceAccountTemplate:
     metadata:
-      name: openwebui-cnpg-backup-sa
       annotations:
         eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-cnpg-backup
   backup:
