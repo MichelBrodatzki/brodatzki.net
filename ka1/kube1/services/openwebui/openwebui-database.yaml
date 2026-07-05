@@ -1,7 +1,7 @@
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: externalsecret-openwebui-oidc
+  name: externalsecret-openwebui-cnpg
 spec:
   refreshPolicy: CreatedOnce
   secretStoreRef:
