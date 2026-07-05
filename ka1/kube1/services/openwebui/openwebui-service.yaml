@@ -44,6 +44,28 @@ spec:
       remoteRef:
         key: /ka1/openwebui/oidc/client_secret
 ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-openwebui-model-apis
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: openwebui-secretstore
+    kind: SecretStore
+  target:
+    name: secret-openwebui-model-apis
+  data:
+    - secretKey: base_urls
+      remoteRef:
+        key: /ka1/openwebui/openai/base_urls
+    - secretKey: api_keys
+      remoteRef:
+        key: /ka1/openwebui/openai/api_keys
+    - secretKey: configs
+      remoteRef:
+        key: /ka1/openwebui/openai/configs
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -109,8 +131,31 @@ spec:
               value: 'True'
             - name: ENABLE_OLLAMA_API
               value: 'False'
+            - name: ENABLE_OPENAI_API
+              value: 'True'
+            - name: OPENAI_API_BASE_URLS
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openwebui-model-apis
+                  key: base_urls
+            - name: OPENAI_API_KEYS
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openwebui-model-apis
+                  key: api_keys
+            - name: OPENAI_API_CONFIGS
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openwebui-model-apis
+                  key: configs
             - name: ENABLE_IMAGE_GENERATION
               value: 'True'
+            - name: IMAGE_GENERATION_MODEL
+              value: 'gpt-image-2'
+            - name: IMAGE_EDIT_MODEL
+              value: 'gpt-image-2'
+            - name: IMAGE_SIZE
+              value: 'auto'
             - name: ENABLE_LOGIN_FORM
               value: 'False'
             - name: ENABLE_SIGNUP
