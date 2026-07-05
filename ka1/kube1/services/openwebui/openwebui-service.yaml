@@ -103,6 +103,8 @@ spec:
                 secretKeyRef:
                   name: cluster-openwebui-app
                   key: uri
+            - name: ENABLE_PERSISTENT_CONFIG
+              value: 'False'
             - name: ENABLE_CHANNELS
               value: 'True'
             - name: ENABLE_OLLAMA_API
