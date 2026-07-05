@@ -154,10 +154,6 @@ spec:
                   key: configs
             - name: ENABLE_IMAGE_GENERATION
               value: 'True'
-            - name: IMAGE_GENERATION_MODEL
-              value: 'gpt-image-2'
-            - name: IMAGE_EDIT_MODEL
-              value: 'gpt-image-2'
             - name: IMAGE_SIZE
               value: 'auto'
             - name: ENABLE_LOGIN_FORM
