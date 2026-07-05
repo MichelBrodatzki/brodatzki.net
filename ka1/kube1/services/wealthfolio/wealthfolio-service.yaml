@@ -50,6 +50,31 @@ spec:
       remoteRef:
         key: /ka1/wealthfolio/auth_pw_hash
 ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-wealthfolio-secrets
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: wealthfolio-secretstore
+    kind: SecretStore
+  target:
+    name: secret-wealthfolio-oidc
+  data:
+    - secretKey: discovery
+      remoteRef:
+        key: /ka1/wealthfolio/oidc/discovery
+    - secretKey: client_id
+      remoteRef:
+        key: /ka1/wealthfolio/oidc/client_id
+    - secretKey: client_secret
+      remoteRef:
+        key: /ka1/wealthfolio/oidc/client_secret
+    - secretKey: allowed_subs
+      remoteRef:
+        key: /ka1/wealthfolio/oidc/allowed_subs
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -117,6 +142,28 @@ spec:
               value: "1440"
             - name: WF_CORS_ALLOW_ORIGINS
               value: "https://wealthfolio.ka1.brodatzki.net"
+            - name: WF_OIDC_ISSUER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: secret-wealthfolio-oidc
+                  key: discovery
+            - name: WF_OIDC_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: secret-wealthfolio-oidc
+                  key: client_id
+            - name: WF_OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secret-wealthfolio-oidc
+                  key: client_secret
+            - name: WF_OIDC_REDIRECT_URL
+              value: "https://wealthfolio.ka1.brodatzki.net/api/v1/auth/oidc/callback"
+            - name: WF_OIDC_ALLOWED_SUBS
+              valueFrom:
+                secretKeyRef:
+                  name: secret-actualbudget-oidc
+                  key: allowed_subs
           imagePullPolicy: Always
       volumes:
         - name: wealthfolio-data
