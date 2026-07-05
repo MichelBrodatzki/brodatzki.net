@@ -135,6 +135,8 @@ spec:
               value: 'True'
             - name: DEFAULT_MODELS
               value: 'claude-sonnet-5'
+            - name: DEFAULT_PINNED_MODELS
+              value: 'claude-sonnet-5,claude-haiku-4-5,gpt-5.4-mini'
             - name: OPENAI_API_BASE_URLS
               valueFrom:
                 secretKeyRef:
