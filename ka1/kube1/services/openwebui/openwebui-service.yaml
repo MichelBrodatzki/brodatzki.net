@@ -133,6 +133,8 @@ spec:
               value: 'False'
             - name: ENABLE_OPENAI_API
               value: 'True'
+            - name: DEFAULT_MODELS
+              value: 'claude-sonnet-5'
             - name: OPENAI_API_BASE_URLS
               valueFrom:
                 secretKeyRef:
