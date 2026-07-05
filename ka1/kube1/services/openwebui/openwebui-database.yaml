@@ -1,0 +1,31 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-openwebui
+spec:
+  instances: 1
+  storage:
+    size: 1Gi
+  serviceAccountTemplate:
+    metadata:
+      name: openwebui-cnpg-backup-sa
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-cnpg-backup
+  backup:
+    retentionPolicy: '14d'
+    barmanObjectStore:
+        destinationPath: s3://backups-brodatzkinet-891920435804/ka1_brodatzki_network/kube1/cnpg/openwebui
+        wal:
+          compression: gzip
+        data:
+          compression: gzip
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: cluster-openwebui-daily
+spec:
+  schedule: '0 0 3 * * *'
+  backupOwnerReference: self
+  cluster:
+    name: cluster-openwebui
