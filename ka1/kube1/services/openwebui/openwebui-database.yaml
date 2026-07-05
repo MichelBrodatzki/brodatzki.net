@@ -15,10 +15,18 @@ spec:
     retentionPolicy: '14d'
     barmanObjectStore:
         destinationPath: s3://backups-brodatzkinet-891920435804/ka1_brodatzki_network/kube1/cnpg/openwebui
+        s3Credentials:
+          inheritFromIAMRole: true
         wal:
           compression: gzip
         data:
           compression: gzip
+  externalClusters:
+  - name: cluster-openwebui-backup
+    barmanObjectStore:
+      destinationPath: s3://backups-brodatzkinet-891920435804/ka1_brodatzki_network/kube1/cnpg/openwebui
+      s3Credentials:
+          inheritFromIAMRole: true
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
