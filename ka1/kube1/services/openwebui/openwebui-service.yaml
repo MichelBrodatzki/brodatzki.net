@@ -109,8 +109,14 @@ spec:
               value: 'False'
             - name: ENABLE_IMAGE_GENERATION
               value: 'True'
+            - name: ENABLE_LOGIN_FORM
+              value: 'False'
             - name: ENABLE_OAUTH_SIGNUP
               value: 'True'
+            - name: ENABLE_PASSWORD_AUTH
+              value: 'False'
+            - name: ENABLE_PASSWORD_CHANGE_FORM
+              value: 'False'
             - name: OAUTH_MERGE_ACCOUNTS_BY_EMAIL
               value: 'True'
             - name: ENABLE_OAUTH_ID_TOKEN_COOKIE
