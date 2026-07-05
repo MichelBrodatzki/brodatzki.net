@@ -1,11 +1,6 @@
-data "tls_certificate" "ka1_oidc" {
-  url = "https://raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1/.well-known/openid-configuration"
-}
-
-resource "aws_iam_openid_connect_provider" "ka1_oidc" {
-  url             = "https://raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1"
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = [data.tls_certificate.ka1_oidc.certificates[0].sha1_fingerprint]
+# Created by greenfield/02_oidc_provider
+data "aws_iam_openid_connect_provider" "ka1_oidc" {
+  arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1"
 }
 
 data "aws_iam_policy_document" "ka1_oidc_workload_assume_role" {
@@ -14,12 +9,12 @@ data "aws_iam_policy_document" "ka1_oidc_workload_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.ka1_oidc.arn]
+      identifiers = [data.aws_iam_openid_connect_provider.ka1_oidc.arn]
     }
 
     condition {
       test     = "StringEquals"
-      variable = "${aws_iam_openid_connect_provider.ka1_oidc.url}:sub"
+      variable = "${data.aws_iam_openid_connect_provider.ka1_oidc.url}:sub"
       values = [
         "system:serviceaccount:openwebui:openwebui-cnpg-backup-sa"
       ]

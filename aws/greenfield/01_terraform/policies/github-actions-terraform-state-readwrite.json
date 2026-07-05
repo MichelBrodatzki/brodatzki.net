@@ -4,12 +4,7 @@
         {
             "Effect": "Allow",
             "Action": [
-                "iam:CreateOpenIDConnectProvider",
-                "iam:DeleteOpenIDConnectProvider",
-                "iam:GetOpenIDConnectProvider",
-                "iam:UpdateOpenIDConnectProvider",
-                "iam:UpdateOpenIDConnectProviderThumbprint",
-                "iam:TagOpenIDConnectProvider"
+                "iam:GetOpenIDConnectProvider"
             ],
             "Resource": "arn:aws:iam::891920435804:oidc-provider/raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1"
         },
@@ -45,7 +40,10 @@
                 "iam:GetPolicyVersion",
                 "iam:ListPolicyVersions"
             ],
-            "Resource": "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access"
+            "Resource": [
+                "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access",
+                "arn:aws:iam::891920435804:policy/ka1-cnpg-backup-access"
+            ]
         },
         {
             "Effect": "Allow",
