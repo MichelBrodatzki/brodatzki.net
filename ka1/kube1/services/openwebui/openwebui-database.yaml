@@ -1,3 +1,22 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-openwebui-oidc
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: openwebui-secretstore
+    kind: SecretStore
+  target:
+    name: secret-openwebui-cnpg
+  data:
+    - secretKey: ACCESS_KEY_ID
+      remoteRef:
+        key: /ka1/openwebui/cnpg/key_id
+    - secretKey: ACCESS_SECRET_KEY
+      remoteRef:
+        key: /ka1/openwebui/cnpg/secret_key
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -6,16 +25,17 @@ spec:
   instances: 1
   storage:
     size: 1Gi
-  serviceAccountTemplate:
-    metadata:
-      annotations:
-        eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-cnpg-backup
   backup:
     retentionPolicy: '14d'
     barmanObjectStore:
-        destinationPath: s3://backups-brodatzkinet-891920435804/ka1_brodatzki_network/kube1/cnpg/openwebui
+        destinationPath: s3://brodatzkinet-ka1@s3.eu-central-003.backblazeb2.com/cnpg/openwebui
         s3Credentials:
-          inheritFromIAMRole: true
+          accessKeyId:
+            name: secret-openwebui-cnpg
+            key: ACCESS_KEY_ID
+          secretAccessKey:
+            name: secret-openwebui-cnpg
+            key: ACCESS_SECRET_KEY
         wal:
           compression: gzip
         data:
@@ -23,9 +43,14 @@ spec:
   externalClusters:
   - name: cluster-openwebui-backup
     barmanObjectStore:
-      destinationPath: s3://backups-brodatzkinet-891920435804/ka1_brodatzki_network/kube1/cnpg/openwebui
+      destinationPath: s3://brodatzkinet-ka1@s3.eu-central-003.backblazeb2.com/cnpg/openwebui
       s3Credentials:
-          inheritFromIAMRole: true
+        accessKeyId:
+          name: secret-openwebui-cnpg
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: secret-openwebui-cnpg
+          key: ACCESS_SECRET_KEY
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
