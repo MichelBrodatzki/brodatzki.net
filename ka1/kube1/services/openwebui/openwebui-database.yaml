@@ -26,7 +26,7 @@ spec:
   storage:
     size: 16Gi
   boostrap:
-    pg_basebackup:
+    recovery:
       source: cluster-openwebui-backup
   backup:
     retentionPolicy: '14d'
