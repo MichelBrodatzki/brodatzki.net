@@ -47,7 +47,7 @@ spec:
   externalClusters:
   - name: cluster-openwebui-backup
     barmanObjectStore:
-      destinationPath: s3://brodatzkinet-ka1/cnpg/openwebui
+      destinationPath: s3://brodatzkinet-ka1/cnpg/.restore/openwebui
       endpointURL: https://s3.eu-central-003.backblazeb2.com
       s3Credentials:
         accessKeyId:
