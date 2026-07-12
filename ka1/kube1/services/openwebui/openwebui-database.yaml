@@ -25,7 +25,7 @@ spec:
   instances: 1
   storage:
     size: 16Gi
-  boostrap:
+  bootsrap:
     recovery:
       source: cluster-openwebui-backup
   backup:
