@@ -11,4 +11,5 @@ updates:
       - "/ka1/kube1/services/wealthfolio"
       - "/ka1/kube1/services/zigbee2mqtt"
     schedule:
-      interval: "daily"
+      interval: "cron"
+      cronjob: "0 3 * * *"
