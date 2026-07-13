@@ -41,28 +41,6 @@ spec:
       remoteRef:
         key: /ka1/mealie/oidc/client_secret
 ---
-apiVersion: external-secrets.io/v1
-kind: ExternalSecret
-metadata:
-  name: externalsecret-mealie-model-apis
-spec:
-  refreshPolicy: CreatedOnce
-  secretStoreRef:
-    name: mealie-secretstore
-    kind: SecretStore
-  target:
-    name: secret-mealie-model-apis
-  data:
-    - secretKey: base_urls
-      remoteRef:
-        key: /ka1/mealie/openai/base_urls
-    - secretKey: api_keys
-      remoteRef:
-        key: /ka1/mealie/openai/api_keys
-    - secretKey: configs
-      remoteRef:
-        key: /ka1/mealie/openai/configs
----
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
