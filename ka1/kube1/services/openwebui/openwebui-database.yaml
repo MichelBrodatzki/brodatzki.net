@@ -31,7 +31,7 @@ spec:
   backup:
     retentionPolicy: '14d'
     barmanObjectStore:
-        destinationPath: s3://brodatzkinet-ka1/cnpg/openwebui-20260712-2
+        destinationPath: s3://brodatzkinet-ka1/cnpg/openwebui-20260713-1
         endpointURL: https://s3.eu-central-003.backblazeb2.com
         s3Credentials:
           accessKeyId:
@@ -48,7 +48,7 @@ spec:
   - name: cluster-openwebui-backup
     barmanObjectStore:
       serverName: cluster-openwebui
-      destinationPath: s3://brodatzkinet-ka1/cnpg/.restore/openwebui
+      destinationPath: s3://brodatzkinet-ka1/cnpg/openwebui-20260712-2
       endpointURL: https://s3.eu-central-003.backblazeb2.com
       s3Credentials:
         accessKeyId:
