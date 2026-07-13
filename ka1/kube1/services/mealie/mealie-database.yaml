@@ -1,0 +1,69 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-mealie-cnpg
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: mealie-secretstore
+    kind: SecretStore
+  target:
+    name: secret-mealie-cnpg
+  data:
+    - secretKey: ACCESS_KEY_ID
+      remoteRef:
+        key: /ka1/mealie/cnpg/key_id
+    - secretKey: ACCESS_SECRET_KEY
+      remoteRef:
+        key: /ka1/mealie/cnpg/secret_key
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-mealie
+spec:
+  instances: 1
+  storage:
+    size: 8Gi
+  # bootstrap:
+  #   recovery:
+  #     source: cluster-mealie-backup
+  backup:
+    retentionPolicy: '14d'
+    barmanObjectStore:
+        destinationPath: s3://brodatzkinet-ka1/cnpg/mealie-20260713-1
+        endpointURL: https://s3.eu-central-003.backblazeb2.com
+        s3Credentials:
+          accessKeyId:
+            name: secret-mealie-cnpg
+            key: ACCESS_KEY_ID
+          secretAccessKey:
+            name: secret-mealie-cnpg
+            key: ACCESS_SECRET_KEY
+        wal:
+          compression: gzip
+        data:
+          compression: gzip
+  # externalClusters:
+  # - name: cluster-mealie-backup
+  #   barmanObjectStore:
+  #     serverName: cluster-mealie
+  #     destinationPath: s3://brodatzkinet-ka1/cnpg/mealie-20260713-1
+  #     endpointURL: https://s3.eu-central-003.backblazeb2.com
+  #     s3Credentials:
+  #       accessKeyId:
+  #         name: secret-mealie-cnpg
+  #         key: ACCESS_KEY_ID
+  #       secretAccessKey:
+  #         name: secret-mealie-cnpg
+  #         key: ACCESS_SECRET_KEY
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: cluster-mealie-daily
+spec:
+  schedule: '0 0 3 * * *'
+  backupOwnerReference: self
+  cluster:
+    name: cluster-mealie

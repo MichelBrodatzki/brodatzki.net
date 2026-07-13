@@ -1,0 +1,162 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mealie-secrets-sa
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: mealie-secretstore
+spec:
+  provider:
+    aws:
+      service: ParameterStore
+      region: eu-central-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: mealie-secrets-sa
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-mealie-oidc
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: mealie-secretstore
+    kind: SecretStore
+  target:
+    name: secret-mealie-oidc
+  data:
+    - secretKey: config_url
+      remoteRef:
+        key: /ka1/mealie/oidc/config_url
+    - secretKey: client_id
+      remoteRef:
+        key: /ka1/mealie/oidc/client_id
+    - secretKey: client_secret
+      remoteRef:
+        key: /ka1/mealie/oidc/client_secret
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-mealie-model-apis
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: mealie-secretstore
+    kind: SecretStore
+  target:
+    name: secret-mealie-model-apis
+  data:
+    - secretKey: base_urls
+      remoteRef:
+        key: /ka1/mealie/openai/base_urls
+    - secretKey: api_keys
+      remoteRef:
+        key: /ka1/mealie/openai/api_keys
+    - secretKey: configs
+      remoteRef:
+        key: /ka1/mealie/openai/configs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mealie-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 4Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mealie
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 9000
+      targetPort: 9000
+  selector:
+    app: mealie
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mealie
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mealie
+  template:
+    metadata:
+      labels:
+        app: mealie
+    spec:
+      hostname: mealie
+      containers:
+        - name: mealie
+          image: ghcr.io/mealie-recipes/mealie:v3.20.1
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - name: mealie-data
+              mountPath: /app/data
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 512Mi
+            limits:
+              memory: 1Gi
+          env:
+            - name: BASE_URL
+              value: https://mealie.ka1.brodatzki.net
+            - name: TZ
+              value: Europe/Berlin
+            - name: ALLOW_PASSWORD_LOGIN
+              value: 'False'
+            - name: DB_ENGINE
+              value: postgres
+            - name: POSTGRES_URL_OVERRIDE
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-mealie-app
+                  key: uri
+            - name: OIDC_AUTH_ENABLED
+              value: 'True'
+            - name: OIDC_CONFIGURATION_URL
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mealie-oidc
+                  key: config_url
+            - name: OIDC_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mealie-oidc
+                  key: client_id
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mealie-oidc
+                  key: client_secret
+            - name: OIDC_PROVIDER_NAME
+              value: 'Brodatzki ID'
+            - name: OIDC_GROUPS_CLAIM
+              value: account_roles
+            - name: OIDC_USER_GROUP
+              value: user
+            - name: OIDC_ADMIN_GROUP
+              value: admin
+      volumes:
+        - name: mealie-data
+          persistentVolumeClaim:
+            claimName: mealie-data-pvc
