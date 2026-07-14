@@ -112,7 +112,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: wealthfolio
-          image: ghcr.io/wealthfolio/wealthfolio:3.6.1
+          image: ghcr.io/wealthfolio/wealthfolio:3.6.2
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
