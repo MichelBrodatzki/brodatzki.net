@@ -17,46 +17,44 @@ spec:
       remoteRef:
         key: /ka1/openwebui/cnpg/secret_key
 ---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: openwebui-backup-store
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  retentionPolicy: "14d"
+  configuration:
+    destinationPath: s3://brodatzkinet-ka1/cnpg/openwebui-20260713-1
+    endpointURL: https://s3.eu-central-003.backblazeb2.com
+    s3Credentials:
+      accessKeyId:
+        name: secret-openwebui-cnpg
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: secret-openwebui-cnpg
+        key: ACCESS_SECRET_KEY
+    wal:
+      compression: gzip
+    data:
+      compression: gzip
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cluster-openwebui
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   instances: 1
   storage:
     size: 16Gi
-  bootstrap:
-    recovery:
-      source: cluster-openwebui-backup
-  backup:
-    retentionPolicy: '14d'
-    barmanObjectStore:
-        destinationPath: s3://brodatzkinet-ka1/cnpg/openwebui-20260713-1
-        endpointURL: https://s3.eu-central-003.backblazeb2.com
-        s3Credentials:
-          accessKeyId:
-            name: secret-openwebui-cnpg
-            key: ACCESS_KEY_ID
-          secretAccessKey:
-            name: secret-openwebui-cnpg
-            key: ACCESS_SECRET_KEY
-        wal:
-          compression: gzip
-        data:
-          compression: gzip
-  externalClusters:
-  - name: cluster-openwebui-backup
-    barmanObjectStore:
-      serverName: cluster-openwebui
-      destinationPath: s3://brodatzkinet-ka1/cnpg/openwebui-20260712-2
-      endpointURL: https://s3.eu-central-003.backblazeb2.com
-      s3Credentials:
-        accessKeyId:
-          name: secret-openwebui-cnpg
-          key: ACCESS_KEY_ID
-        secretAccessKey:
-          name: secret-openwebui-cnpg
-          key: ACCESS_SECRET_KEY
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: openwebui-backup-store
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
@@ -67,3 +65,6 @@ spec:
   backupOwnerReference: self
   cluster:
     name: cluster-openwebui
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
