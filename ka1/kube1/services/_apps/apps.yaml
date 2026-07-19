@@ -7,6 +7,8 @@ spec:
   syncPolicy:
     automated:
       enabled: true
+      prune: true
+      selfHeal: true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: restricted
@@ -14,10 +16,11 @@ spec:
         pod-security.kubernetes.io/audit: restricted
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/traefik-tunnel-config-provider/
   destination:
     server: https://kubernetes.default.svc
@@ -32,6 +35,8 @@ spec:
   syncPolicy:
     automated:
       enabled: true
+      prune: true
+      selfHeal: true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: baseline
@@ -39,10 +44,11 @@ spec:
         pod-security.kubernetes.io/audit: restricted
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/plex/
   destination:
     server: https://kubernetes.default.svc
@@ -57,6 +63,8 @@ spec:
   syncPolicy:
     automated:
       enabled: true
+      prune: true
+      selfHeal: true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: baseline
@@ -64,10 +72,11 @@ spec:
         pod-security.kubernetes.io/audit: restricted
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/homeassistant/
   destination:
     server: https://kubernetes.default.svc
@@ -82,6 +91,8 @@ spec:
   syncPolicy:
     automated:
       enabled: true
+      prune: true
+      selfHeal: true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: baseline
@@ -89,10 +100,11 @@ spec:
         pod-security.kubernetes.io/audit: restricted
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/mosquitto/
   destination:
     server: https://kubernetes.default.svc
@@ -107,6 +119,8 @@ spec:
   syncPolicy:
     automated:
       enabled: true
+      prune: true
+      selfHeal: true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: baseline
@@ -114,10 +128,11 @@ spec:
         pod-security.kubernetes.io/audit: restricted
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/zigbee2mqtt/
   destination:
     server: https://kubernetes.default.svc
@@ -132,6 +147,8 @@ spec:
   syncPolicy:
     automated:
       enabled: true
+      prune: true
+      selfHeal: true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: restricted
@@ -139,10 +156,11 @@ spec:
         pod-security.kubernetes.io/audit: restricted
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/wealthfolio/
   destination:
     server: https://kubernetes.default.svc
@@ -157,6 +175,8 @@ spec:
   syncPolicy:
     automated:
       enabled: true
+      prune: true
+      selfHeal: true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: restricted
@@ -164,10 +184,11 @@ spec:
         pod-security.kubernetes.io/audit: restricted
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/actualbudget/
   destination:
     server: https://kubernetes.default.svc
@@ -182,6 +203,8 @@ spec:
   syncPolicy:
     automated:
       enabled: true
+      prune: true
+      selfHeal: true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: baseline
@@ -189,10 +212,11 @@ spec:
         pod-security.kubernetes.io/audit: restricted
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/openwebui/
   destination:
     server: https://kubernetes.default.svc
@@ -217,7 +241,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/openwebui-db/
   destination:
     server: https://kubernetes.default.svc
@@ -232,6 +256,8 @@ spec:
   syncPolicy:
     automated:
       enabled: true
+      prune: true
+      selfHeal: true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: baseline
@@ -239,10 +265,11 @@ spec:
         pod-security.kubernetes.io/audit: restricted
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/kanidm/
   destination:
     server: https://kubernetes.default.svc
@@ -257,6 +284,8 @@ spec:
   syncPolicy:
     automated:
       enabled: true
+      prune: true
+      selfHeal: true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: baseline
@@ -264,10 +293,11 @@ spec:
         pod-security.kubernetes.io/audit: restricted
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/mealie/
   destination:
     server: https://kubernetes.default.svc
@@ -292,7 +322,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/mealie-db/
   destination:
     server: https://kubernetes.default.svc
