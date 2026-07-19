@@ -48,6 +48,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
     argocd.argoproj.io/sync-options: Prune=false,Delete=false
 spec:
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.4-system-trixie
   instances: 1
   storage:
     size: 16Gi
