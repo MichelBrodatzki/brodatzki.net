@@ -148,7 +148,7 @@ tee "$assume_policy_file" >/dev/null <<EOF
 	    "Action": "sts:AssumeRoleWithWebIdentity",
 	    "Condition": {
 		"StringEquals": {
-		    "token.actions.githubusercontent.com:sub": "repo:$github_repository:environment:aws-production",
+		    "token.actions.githubusercontent.com:sub": "repo:${github_repository}:environment:aws-production",
 		    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
 		}
 	    }
@@ -216,7 +216,7 @@ else
 	    "Action": "sts:AssumeRoleWithWebIdentity",
 	    "Condition": {
 		"StringEquals": {
-		    "token.actions.githubusercontent.com:sub": "repo:$github_repository:pull_request",
+		    "token.actions.githubusercontent.com:sub": "repo:${github_repository}:pull_request",
 		    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
 		}
 	    }
