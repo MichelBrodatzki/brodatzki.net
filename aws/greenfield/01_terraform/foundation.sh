@@ -196,15 +196,9 @@ fi
 
 # Create RO-access role for GitHub Actions to assume
 s3_iam_ro_role_exists=$(aws iam list-roles --profile "$aws_cli_profile" | jq '[.Roles[].RoleName] | any(.=="github-actions-terraform-state-readonly")')
-
-if [ "$s3_iam_ro_role_exists" = "true" ]; then
-	printf '\033[0;33m%s\033[0m\n' "WARNING: S3 Bucket GitHub RO-access role already exists. Skipping creating ..."
-else
-	printf '\033[0;32m%s\033[0m\n' "S3 Bucket RO-access role does not exist."
-	printf '\033[0;32m%s\033[0m\n' "Creating assume policy document ..."
-	assume_policy_file=$(mktemp)
-	cleanup_files+=("$assume_policy_file")
-	tee "$assume_policy_file" >/dev/null <<EOF
+assume_policy_file=$(mktemp)
+cleanup_files+=("$assume_policy_file")
+tee "$assume_policy_file" >/dev/null <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -216,7 +210,7 @@ else
 	    "Action": "sts:AssumeRoleWithWebIdentity",
 	    "Condition": {
 		"StringEquals": {
-		    "token.actions.githubusercontent.com:sub": "repo:${github_repository}:pull_request",
+		    "token.actions.githubusercontent.com:sub": "repo:${github_repository}:ref:refs/heads/main",
 		    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
 		}
 	    }
@@ -224,6 +218,12 @@ else
     ]
 }
 EOF
+
+if [ "$s3_iam_ro_role_exists" = "true" ]; then
+	printf '\033[0;32m%s\033[0m\n' "S3 Bucket GitHub RO-access role already exists. Updating its trust policy ..."
+	aws iam update-assume-role-policy --role-name github-actions-terraform-state-readonly --policy-document "file://$assume_policy_file" --no-cli-pager --profile "$aws_cli_profile"
+else
+	printf '\033[0;32m%s\033[0m\n' "S3 Bucket RO-access role does not exist."
 	printf '\033[0;32m%s\033[0m\n' "Creating role ..."
 	aws iam create-role --role-name github-actions-terraform-state-readonly --assume-role-policy-document "file://$assume_policy_file" --no-cli-pager --profile "$aws_cli_profile" >/dev/null
 
