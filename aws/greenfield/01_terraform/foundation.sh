@@ -14,6 +14,17 @@ if [[ -z "${AWS_CLI_PROFILE:-}" ]]; then
 fi
 aws_cli_profile="$AWS_CLI_PROFILE"
 
+origin_url=$(git remote get-url origin)
+case "$origin_url" in
+	git@github.com:*) github_repository="${origin_url#git@github.com:}" ;;
+	https://github.com/*) github_repository="${origin_url#https://github.com/}" ;;
+	*)
+		printf '\033[0;31m%s\033[0m\n' "ERROR: Git origin must be a GitHub SSH or HTTPS URL. Found: $origin_url"
+		exit 1
+		;;
+esac
+github_repository="${github_repository%.git}"
+
 # Construct tf-state S3 bucket name
 aws_account_id=$(aws sts get-caller-identity --query Account --output text --profile "$aws_cli_profile")
 tf_state_bucket_name="tf-state-brodatzkinet-$aws_account_id"
@@ -123,15 +134,9 @@ fi
 
 # Create RW-access role for GitHub Actions to assume
 s3_iam_rw_role_exists=$(aws iam list-roles --profile "$aws_cli_profile" | jq '[.Roles[].RoleName] | any(.=="github-actions-terraform-state-readwrite")')
-
-if [ "$s3_iam_rw_role_exists" = "true" ]; then
-	printf '\033[0;33m%s\033[0m\n' "WARNING: S3 Bucket GitHub RW-access role already exists. Skipping creating ..."
-else
-	printf '\033[0;32m%s\033[0m\n' "S3 Bucket RW-access role does not exist."
-	printf '\033[0;32m%s\033[0m\n' "Creating assume policy document ..."
-	assume_policy_file=$(mktemp)
-	cleanup_files+=("$assume_policy_file")
-	tee "$assume_policy_file" >/dev/null <<EOF
+assume_policy_file=$(mktemp)
+cleanup_files+=("$assume_policy_file")
+tee "$assume_policy_file" >/dev/null <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -143,7 +148,7 @@ else
 	    "Action": "sts:AssumeRoleWithWebIdentity",
 	    "Condition": {
 		"StringEquals": {
-		    "token.actions.githubusercontent.com:sub": "repo:${${$(git remote get-url origin)#git@github.com:}%.git}:ref:refs/heads/main",
+		    "token.actions.githubusercontent.com:sub": "repo:$github_repository:environment:aws-production",
 		    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
 		}
 	    }
@@ -151,6 +156,12 @@ else
     ]
 }
 EOF
+
+if [ "$s3_iam_rw_role_exists" = "true" ]; then
+	printf '\033[0;32m%s\033[0m\n' "S3 Bucket GitHub RW-access role already exists. Updating its trust policy ..."
+	aws iam update-assume-role-policy --role-name github-actions-terraform-state-readwrite --policy-document "file://$assume_policy_file" --no-cli-pager --profile "$aws_cli_profile"
+else
+	printf '\033[0;32m%s\033[0m\n' "S3 Bucket RW-access role does not exist."
 	printf '\033[0;32m%s\033[0m\n' "Creating role ..."
 	aws iam create-role --role-name github-actions-terraform-state-readwrite --assume-role-policy-document "file://$assume_policy_file" --no-cli-pager --profile "$aws_cli_profile" >/dev/null
 
@@ -205,7 +216,7 @@ else
 	    "Action": "sts:AssumeRoleWithWebIdentity",
 	    "Condition": {
 		"StringEquals": {
-		    "token.actions.githubusercontent.com:sub": "repo:${${$(git remote get-url origin)#git@github.com:}%.git}:pull_request",
+		    "token.actions.githubusercontent.com:sub": "repo:$github_repository:pull_request",
 		    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
 		}
 	    }
