@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ManageHostBackupObjectsOnly",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::backups-brodatzkinet-891920435804/vps1_netcup_brodatzki_network/*"
+        },
+        {
+            "Sid": "ListHostBackupPrefixOnly",
+            "Effect": "Allow",
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::backups-brodatzkinet-891920435804",
+            "Condition": {
+                "StringLike": {
+                    "s3:prefix": "vps1_netcup_brodatzki_network/*"
+                }
+            }
+        }
+    ]
+}

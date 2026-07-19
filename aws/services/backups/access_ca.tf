@@ -22,7 +22,8 @@ resource "aws_rolesanywhere_trust_anchor" "backup" {
 resource "aws_iam_role" "backup" {
   for_each = local.backup_hosts_map
 
-  name = "${replace(each.value, ".", "-")}-backup"
+  name                 = "${replace(each.value, ".", "-")}-backup"
+  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/terraform-boundary-${replace(each.value, ".", "-")}-backup"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{

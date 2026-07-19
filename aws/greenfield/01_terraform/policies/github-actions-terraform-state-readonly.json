@@ -2,13 +2,13 @@
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "ReadKa1OidcProvider",
             "Effect": "Allow",
-            "Action": [
-                "iam:GetOpenIDConnectProvider"
-            ],
+            "Action": "iam:GetOpenIDConnectProvider",
             "Resource": "arn:aws:iam::891920435804:oidc-provider/raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1"
         },
         {
+            "Sid": "ReadTerraformManagedRoles",
             "Effect": "Allow",
             "Action": [
                 "iam:GetRole",
@@ -17,21 +17,29 @@
                 "iam:ListAttachedRolePolicies",
                 "iam:ListRolePolicies"
             ],
-            "Resource": "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly"
+            "Resource": [
+                "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly",
+                "arn:aws:iam::891920435804:role/vps1-netcup-brodatzki-network-backup"
+            ]
         },
         {
+            "Sid": "ReadTerraformBoundaryAndLegacyPolicies",
             "Effect": "Allow",
             "Action": [
                 "iam:GetPolicy",
                 "iam:GetPolicyVersion",
-                "iam:ListPolicyVersions"
+                "iam:ListPolicyVersions",
+                "iam:ListPolicyTags",
+                "iam:ListEntitiesForPolicy"
             ],
             "Resource": [
-                "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access",
-                "arn:aws:iam::891920435804:policy/ka1-cnpg-backup-access"
+                "arn:aws:iam::891920435804:policy/terraform-boundary-ka1-k8s-secrets-readonly",
+                "arn:aws:iam::891920435804:policy/terraform-boundary-vps1-netcup-brodatzki-network-backup",
+                "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access"
             ]
         },
         {
+            "Sid": "ReadTaggedBackupTrustAnchors",
             "Effect": "Allow",
             "Action": [
                 "rolesanywhere:GetTrustAnchor",
@@ -45,6 +53,7 @@
             }
         },
         {
+            "Sid": "ReadTaggedBackupProfiles",
             "Effect": "Allow",
             "Action": [
                 "rolesanywhere:GetProfile",
@@ -58,17 +67,7 @@
             }
         },
         {
-            "Effect": "Allow",
-            "Action": [
-                "iam:GetRole",
-                "iam:ListRoleTags",
-                "iam:GetRolePolicy",
-                "iam:ListAttachedRolePolicies",
-                "iam:ListRolePolicies"
-            ],
-            "Resource": "arn:aws:iam::891920435804:role/*-backup"
-        },
-        {
+            "Sid": "ReadBackupBucket",
             "Effect": "Allow",
             "Action": [
                 "s3:ListBucket",

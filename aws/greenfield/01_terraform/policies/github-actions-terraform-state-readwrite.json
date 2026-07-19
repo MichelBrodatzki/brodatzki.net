@@ -2,61 +2,96 @@
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "ReadKa1OidcProvider",
             "Effect": "Allow",
-            "Action": [
-                "iam:GetOpenIDConnectProvider"
-            ],
+            "Action": "iam:GetOpenIDConnectProvider",
             "Resource": "arn:aws:iam::891920435804:oidc-provider/raw.githubusercontent.com/MichelBrodatzki/brodatzki.net/main/.static/ka1"
         },
         {
+            "Sid": "ManageBoundedKa1SecretsRole",
             "Effect": "Allow",
             "Action": [
-                "iam:CreateRole",
-                "iam:DeleteRole",
                 "iam:GetRole",
                 "iam:UpdateRole",
                 "iam:TagRole",
+                "iam:UntagRole",
                 "iam:ListRoleTags",
-                "iam:PassRole",
                 "iam:GetRolePolicy",
                 "iam:PutRolePolicy",
                 "iam:DeleteRolePolicy",
-                "iam:AttachRolePolicy",
-                "iam:DetachRolePolicy",
                 "iam:ListAttachedRolePolicies",
-                "iam:ListRolePolicies",
-                "iam:UpdateAssumeRolePolicy"
+                "iam:ListRolePolicies"
             ],
             "Resource": "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly"
         },
         {
+            "Sid": "CreateKa1SecretsRoleWithBoundary",
             "Effect": "Allow",
             "Action": [
-                "iam:CreatePolicy",
-                "iam:CreatePolicyVersion",
-                "iam:DeletePolicy",
-                "iam:TagPolicy",
+                "iam:CreateRole",
+                "iam:PutRolePermissionsBoundary"
+            ],
+            "Resource": "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly",
+            "Condition": {
+                "ArnEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::891920435804:policy/terraform-boundary-ka1-k8s-secrets-readonly"
+                }
+            }
+        },
+        {
+            "Sid": "CleanUpLegacyKa1ManagedPolicyAttachment",
+            "Effect": "Allow",
+            "Action": "iam:DetachRolePolicy",
+            "Resource": "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly",
+            "Condition": {
+                "ArnEquals": {
+                    "iam:PolicyARN": "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access"
+                }
+            }
+        },
+        {
+            "Sid": "CleanUpLegacyKa1ManagedPolicy",
+            "Effect": "Allow",
+            "Action": [
                 "iam:GetPolicy",
                 "iam:GetPolicyVersion",
-                "iam:ListPolicyVersions"
+                "iam:ListPolicyVersions",
+                "iam:ListPolicyTags",
+                "iam:ListEntitiesForPolicy",
+                "iam:DeletePolicyVersion",
+                "iam:DeletePolicy"
             ],
-            "Resource": [
-                "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access",
-                "arn:aws:iam::891920435804:policy/ka1-cnpg-backup-access"
-            ]
+            "Resource": "arn:aws:iam::891920435804:policy/ka1-parameters-readonly-access"
         },
         {
-            "Effect": "Allow",
+            "Sid": "DenyUnboundedKa1SecretsRole",
+            "Effect": "Deny",
             "Action": [
-                "iam:CreateServiceLinkedRole"
+                "iam:CreateRole",
+                "iam:PutRolePermissionsBoundary"
             ],
-            "Resource": "arn:aws:iam::891920435804:role/aws-service-role/rolesanywhere.amazonaws.com/*"
+            "Resource": "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly",
+            "Condition": {
+                "ArnNotEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::891920435804:policy/terraform-boundary-ka1-k8s-secrets-readonly"
+                }
+            }
         },
         {
+            "Sid": "ManageRolesAnywhereServiceLinkedRole",
             "Effect": "Allow",
-            "Action": [
-                "rolesanywhere:CreateTrustAnchor"
-            ],
+            "Action": "iam:CreateServiceLinkedRole",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:AWSServiceName": "rolesanywhere.amazonaws.com"
+                }
+            }
+        },
+        {
+            "Sid": "CreateTaggedBackupTrustAnchor",
+            "Effect": "Allow",
+            "Action": "rolesanywhere:CreateTrustAnchor",
             "Resource": "arn:aws:rolesanywhere:eu-central-1:891920435804:trust-anchor/*",
             "Condition": {
                 "StringEquals": {
@@ -65,6 +100,7 @@
             }
         },
         {
+            "Sid": "ManageTaggedBackupTrustAnchors",
             "Effect": "Allow",
             "Action": [
                 "rolesanywhere:GetTrustAnchor",
@@ -83,10 +119,9 @@
             }
         },
         {
+            "Sid": "CreateTaggedBackupProfile",
             "Effect": "Allow",
-            "Action": [
-                "rolesanywhere:CreateProfile"
-            ],
+            "Action": "rolesanywhere:CreateProfile",
             "Resource": "arn:aws:rolesanywhere:eu-central-1:891920435804:profile/*",
             "Condition": {
                 "StringEquals": {
@@ -95,6 +130,7 @@
             }
         },
         {
+            "Sid": "ManageTaggedBackupProfiles",
             "Effect": "Allow",
             "Action": [
                 "rolesanywhere:GetProfile",
@@ -113,27 +149,77 @@
             }
         },
         {
+            "Sid": "ManageBoundedBackupRole",
             "Effect": "Allow",
             "Action": [
-                "iam:CreateRole",
-                "iam:DeleteRole",
                 "iam:GetRole",
                 "iam:UpdateRole",
                 "iam:TagRole",
+                "iam:UntagRole",
                 "iam:ListRoleTags",
-                "iam:PassRole",
                 "iam:GetRolePolicy",
                 "iam:PutRolePolicy",
                 "iam:DeleteRolePolicy",
-                "iam:AttachRolePolicy",
-                "iam:DetachRolePolicy",
                 "iam:ListAttachedRolePolicies",
-                "iam:ListRolePolicies",
-                "iam:UpdateAssumeRolePolicy"
+                "iam:ListRolePolicies"
             ],
-            "Resource": "arn:aws:iam::891920435804:role/*-backup"
+            "Resource": "arn:aws:iam::891920435804:role/vps1-netcup-brodatzki-network-backup"
         },
         {
+            "Sid": "CreateBackupRoleWithBoundary",
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateRole",
+                "iam:PutRolePermissionsBoundary"
+            ],
+            "Resource": "arn:aws:iam::891920435804:role/vps1-netcup-brodatzki-network-backup",
+            "Condition": {
+                "ArnEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::891920435804:policy/terraform-boundary-vps1-netcup-brodatzki-network-backup"
+                }
+            }
+        },
+        {
+            "Sid": "DenyUnboundedBackupRole",
+            "Effect": "Deny",
+            "Action": [
+                "iam:CreateRole",
+                "iam:PutRolePermissionsBoundary"
+            ],
+            "Resource": "arn:aws:iam::891920435804:role/vps1-netcup-brodatzki-network-backup",
+            "Condition": {
+                "ArnNotEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::891920435804:policy/terraform-boundary-vps1-netcup-brodatzki-network-backup"
+                }
+            }
+        },
+        {
+            "Sid": "PassBackupRoleToRolesAnywhereOnly",
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::891920435804:role/vps1-netcup-brodatzki-network-backup",
+            "Condition": {
+                "StringEquals": {
+                    "iam:PassedToService": "rolesanywhere.amazonaws.com"
+                }
+            }
+        },
+        {
+            "Sid": "DenyBoundaryRemovalRoleDeletionAndManagedPolicyAttachment",
+            "Effect": "Deny",
+            "Action": [
+                "iam:DeleteRolePermissionsBoundary",
+                "iam:DeleteRole",
+                "iam:AttachRolePolicy",
+                "iam:UpdateAssumeRolePolicy"
+            ],
+            "Resource": [
+                "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly",
+                "arn:aws:iam::891920435804:role/vps1-netcup-brodatzki-network-backup"
+            ]
+        },
+        {
+            "Sid": "ManageBackupBucket",
             "Effect": "Allow",
             "Action": [
                 "s3:CreateBucket",

@@ -33,8 +33,9 @@ data "aws_iam_policy_document" "ka1_oidc_workload_assume_role" {
 }
 
 resource "aws_iam_role" "ka1_workload" {
-  name               = "ka1-k8s-secrets-readonly"
-  assume_role_policy = data.aws_iam_policy_document.ka1_oidc_workload_assume_role.json
+  name                 = "ka1-k8s-secrets-readonly"
+  assume_role_policy   = data.aws_iam_policy_document.ka1_oidc_workload_assume_role.json
+  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/terraform-boundary-ka1-k8s-secrets-readonly"
 }
 
 data "aws_iam_policy_document" "ka1_workload_ssm" {
@@ -56,12 +57,8 @@ data "aws_iam_policy_document" "ka1_workload_ssm" {
   }
 }
 
-resource "aws_iam_policy" "ka1_workload_ssm" {
+resource "aws_iam_role_policy" "ka1_workload_ssm" {
   name   = "ka1-parameters-readonly-access"
+  role   = aws_iam_role.ka1_workload.id
   policy = data.aws_iam_policy_document.ka1_workload_ssm.json
-}
-
-resource "aws_iam_role_policy_attachment" "ka1_workload_ssm" {
-  role       = aws_iam_role.ka1_workload.name
-  policy_arn = aws_iam_policy.ka1_workload_ssm.arn
 }
