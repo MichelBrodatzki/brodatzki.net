@@ -23,6 +23,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mosquitto-data-pvc
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
 spec:
   accessModes:
     - ReadWriteOnce

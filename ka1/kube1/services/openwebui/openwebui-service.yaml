@@ -70,6 +70,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: openwebui-data-pvc
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
 spec:
   accessModes:
     - ReadWriteOnce
