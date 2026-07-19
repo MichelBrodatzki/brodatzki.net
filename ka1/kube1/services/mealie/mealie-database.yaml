@@ -17,46 +17,44 @@ spec:
       remoteRef:
         key: /ka1/mealie/cnpg/secret_key
 ---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: mealie-backup-store
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  retentionPolicy: "14d"
+  configuration:
+    destinationPath: s3://brodatzkinet-ka1/cnpg/mealie-20260713-1
+    endpointURL: https://s3.eu-central-003.backblazeb2.com
+    s3Credentials:
+      accessKeyId:
+        name: secret-mealie-cnpg
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: secret-mealie-cnpg
+        key: ACCESS_SECRET_KEY
+    wal:
+      compression: gzip
+    data:
+      compression: gzip
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cluster-mealie
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   instances: 1
   storage:
     size: 8Gi
-  # bootstrap:
-  #   recovery:
-  #     source: cluster-mealie-backup
-  backup:
-    retentionPolicy: '14d'
-    barmanObjectStore:
-        destinationPath: s3://brodatzkinet-ka1/cnpg/mealie-20260713-1
-        endpointURL: https://s3.eu-central-003.backblazeb2.com
-        s3Credentials:
-          accessKeyId:
-            name: secret-mealie-cnpg
-            key: ACCESS_KEY_ID
-          secretAccessKey:
-            name: secret-mealie-cnpg
-            key: ACCESS_SECRET_KEY
-        wal:
-          compression: gzip
-        data:
-          compression: gzip
-  # externalClusters:
-  # - name: cluster-mealie-backup
-  #   barmanObjectStore:
-  #     serverName: cluster-mealie
-  #     destinationPath: s3://brodatzkinet-ka1/cnpg/mealie-20260713-1
-  #     endpointURL: https://s3.eu-central-003.backblazeb2.com
-  #     s3Credentials:
-  #       accessKeyId:
-  #         name: secret-mealie-cnpg
-  #         key: ACCESS_KEY_ID
-  #       secretAccessKey:
-  #         name: secret-mealie-cnpg
-  #         key: ACCESS_SECRET_KEY
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: mealie-backup-store
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
@@ -67,3 +65,6 @@ spec:
   backupOwnerReference: self
   cluster:
     name: cluster-mealie
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
