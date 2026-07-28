@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ka1/kube1/services/_apps/
   destination:
     server: https://kubernetes.default.svc
