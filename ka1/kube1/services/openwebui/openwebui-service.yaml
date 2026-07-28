@@ -131,6 +131,10 @@ spec:
               value: 'False'
             - name: ENABLE_CHANNELS
               value: 'True'
+            - name: ENABLE_SUBAGENTS
+              value: 'True'
+            - name: SUBAGENTS_BACKGROUND_ENABLED
+              value: 'True'
             - name: ENABLE_OLLAMA_API
               value: 'False'
             - name: ENABLE_OPENAI_API
