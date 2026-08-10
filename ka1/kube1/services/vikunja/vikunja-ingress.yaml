@@ -4,7 +4,6 @@ metadata:
   name: vikunja-https-gateway
   annotations:
     cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod"
-    brodatzki.net/enable-public-tunnel: "true"
 spec:
   gatewayClassName: cilium
   listeners:
