@@ -327,3 +327,56 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: mealie
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vikunja
+  namespace: argocd
+spec:
+  syncPolicy:
+    automated:
+      enabled: true
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: baseline
+        pod-security.kubernetes.io/warn: restricted
+        pod-security.kubernetes.io/audit: restricted
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: main
+    path: ka1/kube1/services/vikunja/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vikunja
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vikunja-db
+  namespace: argocd
+spec:
+  syncPolicy:
+    automated:
+      enabled: false
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: baseline
+        pod-security.kubernetes.io/warn: restricted
+        pod-security.kubernetes.io/audit: restricted
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+    targetRevision: main
+    path: ka1/kube1/services/vikunja-db/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vikunja

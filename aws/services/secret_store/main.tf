@@ -26,7 +26,8 @@ data "aws_iam_policy_document" "ka1_oidc_workload_assume_role" {
         "system:serviceaccount:wealthfolio:wealthfolio-secrets-sa",
         "system:serviceaccount:actualbudget:actualbudget-secrets-sa",
         "system:serviceaccount:openwebui:openwebui-secrets-sa",
-        "system:serviceaccount:mealie:mealie-secrets-sa"
+        "system:serviceaccount:mealie:mealie-secrets-sa",
+        "system:serviceaccount:vikunja:vikunja-secrets-sa",
       ]
     }
   }
