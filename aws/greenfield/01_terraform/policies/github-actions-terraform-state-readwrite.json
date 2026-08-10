@@ -20,7 +20,8 @@
                 "iam:PutRolePolicy",
                 "iam:DeleteRolePolicy",
                 "iam:ListAttachedRolePolicies",
-                "iam:ListRolePolicies"
+                "iam:ListRolePolicies",
+                "iam:UpdateAssumeRolePolicy"
             ],
             "Resource": "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly"
         },
@@ -210,13 +211,18 @@
             "Action": [
                 "iam:DeleteRolePermissionsBoundary",
                 "iam:DeleteRole",
-                "iam:AttachRolePolicy",
-                "iam:UpdateAssumeRolePolicy"
+                "iam:AttachRolePolicy"
             ],
             "Resource": [
                 "arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly",
                 "arn:aws:iam::891920435804:role/vps1-netcup-brodatzki-network-backup"
             ]
+        },
+        {
+            "Sid": "DenyBackupRoleTrustPolicyChanges",
+            "Effect": "Deny",
+            "Action": "iam:UpdateAssumeRolePolicy",
+            "Resource": "arn:aws:iam::891920435804:role/vps1-netcup-brodatzki-network-backup"
         },
         {
             "Sid": "ManageBackupBucket",
