@@ -13,6 +13,7 @@ updates:
       - "/ka1/kube1/services/mosquitto"
       - "/ka1/kube1/services/openwebui"
       - "/ka1/kube1/services/plex"
+      - "/ka1/kube1/services/vikunja"
       - "/ka1/kube1/services/wealthfolio"
       - "/ka1/kube1/services/zigbee2mqtt"
     schedule:
