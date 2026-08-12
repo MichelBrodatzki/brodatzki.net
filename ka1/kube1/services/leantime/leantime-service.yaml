@@ -1,0 +1,226 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: leantime-secrets-sa
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: leantime-secretstore
+spec:
+  provider:
+    aws:
+      service: ParameterStore
+      region: eu-central-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: leantime-secrets-sa
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-leantime
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: leantime-secretstore
+    kind: SecretStore
+  target:
+    name: secret-leantime
+  data:
+    - secretKey: session_password
+      remoteRef:
+        key: /ka1/leantime/session_password
+    - secretKey: oidc_provider_url
+      remoteRef:
+        key: /ka1/leantime/oidc/provider_url
+    - secretKey: oidc_client_id
+      remoteRef:
+        key: /ka1/leantime/oidc/client_id
+    - secretKey: oidc_client_secret
+      remoteRef:
+        key: /ka1/leantime/oidc/client_secret
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: leantime-public-userfiles-pvc
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 4Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: leantime-userfiles-pvc
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 4Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: leantime
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: leantime
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: leantime
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: leantime
+  template:
+    metadata:
+      labels:
+        app: leantime
+    spec:
+      hostname: leantime
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: leantime
+          image: leantime/leantime:3.9.8
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: leantime-public-userfiles
+              mountPath: /var/www/html/public/userfiles
+            - name: leantime-userfiles
+              mountPath: /var/www/html/userfiles
+          resources:
+            requests:
+              memory: 512Mi
+            limits:
+              memory: 1Gi
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 30
+          env:
+            - name: LEAN_APP_URL
+              value: https://leantime.ka1.brodatzki.net
+            - name: LEAN_SESSION_SECURE
+              value: 'true'
+            - name: LEAN_SESSION_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-leantime
+                  key: session_password
+            - name: LEAN_SESSION_EXPIRATION
+              value: '480'
+            - name: LEAN_SITENAME
+              value: Leantime
+            - name: LEAN_LANGUAGE
+              value: de-DE
+            - name: LEAN_DEFAULT_TIMEZONE
+              value: Europe/Berlin
+            - name: LEAN_LOG_CHANNELS
+              value: stderr
+            - name: LEAN_DB_DEFAULT_CONNECTION
+              value: pgsql
+            - name: LEAN_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-leantime-app
+                  key: host
+            - name: LEAN_DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-leantime-app
+                  key: port
+            - name: LEAN_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-leantime-app
+                  key: username
+            - name: LEAN_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-leantime-app
+                  key: password
+            - name: LEAN_DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-leantime-app
+                  key: dbname
+            - name: LEAN_DB_SCHEMA
+              value: public
+            - name: LEAN_DB_SSLMODE
+              value: prefer
+            - name: LEAN_OIDC_ENABLE
+              value: 'true'
+            - name: LEAN_OIDC_PROVIDER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: secret-leantime
+                  key: oidc_provider_url
+            - name: LEAN_OIDC_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: secret-leantime
+                  key: oidc_client_id
+            - name: LEAN_OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secret-leantime
+                  key: oidc_client_secret
+            - name: LEAN_OIDC_CREATE_USER
+              value: 'true'
+            - name: LEAN_OIDC_DEFAULT_ROLE
+              value: '20'
+      volumes:
+        - name: leantime-public-userfiles
+          persistentVolumeClaim:
+            claimName: leantime-public-userfiles-pvc
+        - name: leantime-userfiles
+          persistentVolumeClaim:
+            claimName: leantime-userfiles-pvc

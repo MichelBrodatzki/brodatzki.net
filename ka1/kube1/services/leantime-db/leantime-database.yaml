@@ -1,0 +1,72 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-leantime-cnpg
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: leantime-secretstore
+    kind: SecretStore
+  target:
+    name: secret-leantime-cnpg
+  data:
+    - secretKey: ACCESS_KEY_ID
+      remoteRef:
+        key: /ka1/leantime/cnpg/key_id
+    - secretKey: ACCESS_SECRET_KEY
+      remoteRef:
+        key: /ka1/leantime/cnpg/secret_key
+---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: leantime-backup-store
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  retentionPolicy: "14d"
+  configuration:
+    destinationPath: s3://brodatzkinet-ka1/cnpg/leantime-20260812-1
+    endpointURL: https://s3.eu-central-003.backblazeb2.com
+    s3Credentials:
+      accessKeyId:
+        name: secret-leantime-cnpg
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: secret-leantime-cnpg
+        key: ACCESS_SECRET_KEY
+    wal:
+      compression: gzip
+    data:
+      compression: gzip
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-leantime
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.4-system-trixie
+  instances: 1
+  storage:
+    size: 8Gi
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: leantime-backup-store
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: cluster-leantime-daily
+spec:
+  schedule: '0 0 3 * * *'
+  backupOwnerReference: self
+  cluster:
+    name: cluster-leantime
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io

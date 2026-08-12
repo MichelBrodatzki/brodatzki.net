@@ -10,6 +10,7 @@ updates:
       - "/ka1/kube1/services/actualbudget"
       - "/ka1/kube1/services/homeassistant"
       - "/ka1/kube1/services/kanidm"
+      - "/ka1/kube1/services/leantime"
       - "/ka1/kube1/services/mosquitto"
       - "/ka1/kube1/services/openwebui"
       - "/ka1/kube1/services/plex"

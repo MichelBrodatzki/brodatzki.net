@@ -28,6 +28,7 @@ data "aws_iam_policy_document" "ka1_oidc_workload_assume_role" {
         "system:serviceaccount:openwebui:openwebui-secrets-sa",
         "system:serviceaccount:mealie:mealie-secrets-sa",
         "system:serviceaccount:vikunja:vikunja-secrets-sa",
+        "system:serviceaccount:leantime:leantime-secrets-sa",
       ]
     }
   }
