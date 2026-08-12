@@ -109,7 +109,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: leantime
-          image: leantime/leantime:3.9.8
+          image: ghcr.io/michelbrodatzki/leantime-pgsql:3.9.8
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
