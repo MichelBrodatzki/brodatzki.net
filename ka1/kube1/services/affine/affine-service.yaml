@@ -24,7 +24,7 @@ spec:
                 "clientId": {{ .client_id | toString | quote }},
                 "clientSecret": {{ .client_secret | toString | quote }},
                 "issuer": {{ .issuer | toString | quote }},
-                "allowPrivateNetwork": false,
+                "allowPrivateNetwork": true,
                 "args": {
                   "scope": "openid profile email",
                   "claim_id": "sub",
