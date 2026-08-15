@@ -19,6 +19,9 @@ spec:
             "server": {
               "name": "AFFiNE"
             },
+            "flags": {
+              "allowGuestDemoWorkspace": false
+            },
             "auth": {
               "allowSignup": false,
               "allowSignupForOauth": true
