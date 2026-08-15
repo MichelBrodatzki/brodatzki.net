@@ -384,7 +384,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: leantime
+  name: affine
   namespace: argocd
 spec:
   syncPolicy:
@@ -404,15 +404,15 @@ spec:
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
     targetRevision: main
-    path: ka1/kube1/services/leantime/
+    path: ka1/kube1/services/affine/
   destination:
     server: https://kubernetes.default.svc
-    namespace: leantime
+    namespace: affine
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: leantime-db
+  name: affine-db
   namespace: argocd
 spec:
   syncPolicy:
@@ -429,7 +429,7 @@ spec:
   source:
     repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
     targetRevision: main
-    path: ka1/kube1/services/leantime-db/
+    path: ka1/kube1/services/affine-db/
   destination:
     server: https://kubernetes.default.svc
-    namespace: leantime
+    namespace: affine

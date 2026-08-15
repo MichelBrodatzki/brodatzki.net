@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: affine-secrets-sa
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: affine-secretstore
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+spec:
+  provider:
+    aws:
+      service: ParameterStore
+      region: eu-central-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: affine-secrets-sa
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: externalsecret-affine-cnpg
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  refreshPolicy: CreatedOnce
+  secretStoreRef:
+    name: affine-secretstore
+    kind: SecretStore
+  target:
+    name: secret-affine-cnpg
+  data:
+    - secretKey: ACCESS_KEY_ID
+      remoteRef:
+        key: /ka1/affine/cnpg/key_id
+    - secretKey: ACCESS_SECRET_KEY
+      remoteRef:
+        key: /ka1/affine/cnpg/secret_key
+---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: affine-backup-store
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  retentionPolicy: "14d"
+  configuration:
+    destinationPath: s3://brodatzkinet-ka1/cnpg/affine-20260815-1
+    endpointURL: https://s3.eu-central-003.backblazeb2.com
+    s3Credentials:
+      accessKeyId:
+        name: secret-affine-cnpg
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: secret-affine-cnpg
+        key: ACCESS_SECRET_KEY
+    wal:
+      compression: gzip
+    data:
+      compression: gzip
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-affine
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.14-standard-trixie
+  instances: 1
+  bootstrap:
+    initdb:
+      database: affine
+      owner: affine
+      postInitApplicationSQL:
+        - CREATE EXTENSION IF NOT EXISTS vector
+  storage:
+    size: 8Gi
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: affine-backup-store
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: cluster-affine-daily
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  schedule: '0 0 3 * * *'
+  backupOwnerReference: self
+  cluster:
+    name: cluster-affine
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io

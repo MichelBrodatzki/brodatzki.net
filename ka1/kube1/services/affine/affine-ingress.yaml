@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: leantime-https-gateway
+  name: affine-https-gateway
   annotations:
     cert-manager.io/cluster-issuer: "clusterissuer-cloudflare-acme-prod"
 spec:
@@ -10,19 +10,19 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: "leantime.ka1.brodatzki.net"
+      hostname: "affine.ka1.brodatzki.net"
       tls:
         mode: Terminate
         certificateRefs:
         - kind: Secret
-          name: leantime-gateway-tls
+          name: affine-gateway-tls
       allowedRoutes:
         namespaces:
           from: Same
     - name: http
       protocol: HTTP
       port: 80
-      hostname: "leantime.ka1.brodatzki.net"
+      hostname: "affine.ka1.brodatzki.net"
       allowedRoutes:
         namespaces:
           from: Same
@@ -30,13 +30,13 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: leantime-http-to-https-redirect
+  name: affine-http-to-https-redirect
 spec:
   parentRefs:
-    - name: leantime-https-gateway
+    - name: affine-https-gateway
       sectionName: http
   hostnames:
-    - "leantime.ka1.brodatzki.net"
+    - "affine.ka1.brodatzki.net"
   rules:
     - filters:
       - type: RequestRedirect
@@ -47,18 +47,18 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: leantime-service-route
+  name: affine-service-route
 spec:
   parentRefs:
-    - name: leantime-https-gateway
+    - name: affine-https-gateway
       sectionName: https
   hostnames:
-    - "leantime.ka1.brodatzki.net"
+    - "affine.ka1.brodatzki.net"
   rules:
     - matches:
       - path:
           type: PathPrefix
           value: /
       backendRefs:
-        - name: leantime
-          port: 8080
+        - name: affine
+          port: 3010
