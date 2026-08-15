@@ -19,6 +19,10 @@ spec:
             "server": {
               "name": "AFFiNE"
             },
+            "auth": {
+              "allowSignup": false,
+              "allowSignupForOauth": true
+            },
             "oauth": {
               "providers.oidc": {
                 "clientId": {{ .client_id | toString | quote }},
