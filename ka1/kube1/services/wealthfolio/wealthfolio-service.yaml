@@ -137,6 +137,8 @@ spec:
                   key: secret_key
             - name: WF_AUTH_TOKEN_TTL_MINUTES
               value: "1440"
+            - name: WF_MCP_ENABLED
+              value: "true"
             - name: WF_CORS_ALLOW_ORIGINS
               value: "https://wealthfolio.ka1.brodatzki.net"
             - name: WF_OIDC_ISSUER_URL
