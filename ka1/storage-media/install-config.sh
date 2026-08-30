@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 SCRIPT_PATH=$(dirname "$(realpath $0)")
+FILE="/etc/nixos/configuration.nix"
 
 echo "Checking if configuration.nix already exists ..."
-if [ -f "/etc/nixos/configuration.nix" ]
-then
+if [ -f "$FILE" ] || [ -L "$FILE" ]; then
 	read -p "configuration.nix already exists. Overwrite? " -n 1 -r
 	echo
 	if [[ ! $REPLY =~ ^[Yy]$ ]]
