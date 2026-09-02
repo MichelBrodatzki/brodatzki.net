@@ -41,7 +41,7 @@ spec:
       hostname: z2m
       containers:
         - name: z2m
-          image: ghcr.io/koenkk/zigbee2mqtt:2.13.0
+          image: ghcr.io/koenkk/zigbee2mqtt:2.14.0
           ports:
             - containerPort: 8080
           volumeMounts:
