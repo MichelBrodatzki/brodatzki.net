@@ -69,7 +69,7 @@ spec:
       hostname: kanidm
       containers:
         - name: kanidm
-          image: docker.io/kanidm/server:1.10.4
+          image: docker.io/kanidm/server:1.11.2
           ports:
             - containerPort: 8443
           volumeMounts:
