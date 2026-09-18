@@ -1,6 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
+    open-pull-requests-limit: 1000
     directory: "/"
     schedule:
       interval: "weekly"
@@ -17,6 +18,7 @@ updates:
       - "/ka1/kube1/services/vikunja"
       - "/ka1/kube1/services/wealthfolio"
       - "/ka1/kube1/services/zigbee2mqtt"
+    open-pull-requests-limit: 1000
     schedule:
       interval: "cron"
       cronjob: "0 3 * * *"
