@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: monatsabrechnung-data-pvc
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: monatsabrechnung
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+  selector:
+    app: monatsabrechnung
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monatsabrechnung
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monatsabrechnung
+  template:
+    metadata:
+      labels:
+        app: monatsabrechnung
+    spec:
+      hostname: monatsabrechnung
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: monatsabrechnung
+          image: ghcr.io/michelbrodatzki/monatsabrechnung/monatsabrechnung:v1.0.0
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: monatsabrechnung-data
+              mountPath: /data
+          imagePullPolicy: Always
+      volumes:
+        - name: monatsabrechnung-data
+          persistentVolumeClaim:
+            claimName: monatsabrechnung-data-pvc
