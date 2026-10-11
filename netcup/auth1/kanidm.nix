@@ -3,7 +3,7 @@
 {
   networking.firewall.allowedTCPPorts = [ 8444 ];
 
-  services.kanidm.package = pkgs.kanidm_1_10;
+  services.kanidm.package = pkgs.kanidm_1_11;
   services.kanidm.server = {
     enable = true;
 
