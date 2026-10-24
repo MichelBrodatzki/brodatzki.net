@@ -14,6 +14,7 @@
       };
 
       security = {
+        secret_key = "$__file{/run/credentials/grafana.service/secret_key}";
         disable_initial_admin_creation = true;
         cookie_secure = true;
         cookie_samesite = "lax";
@@ -55,10 +56,12 @@
   systemd.services.grafana.serviceConfig = {
     LoadCredential = [
       "grafana_oidc_client_secret:/var/lib/secrets/grafana_oidc_client_secret"
+      "secret_key:/var/lib/secrets/grafana_secret_key"
     ];
 
     ExecStartPre = [
       "${pkgs.coreutils}/bin/test -s /run/credentials/grafana.service/grafana_oidc_client_secret"
+      "${pkgs.coreutils}/bin/test -s /run/credentials/grafana.service/secret_key"
     ];
   };
 
