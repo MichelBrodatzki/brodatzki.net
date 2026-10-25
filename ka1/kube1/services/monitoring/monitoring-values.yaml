@@ -1,0 +1,90 @@
+cluster:
+  name: ka1
+
+destinations:
+  victoriaMetrics:
+    type: prometheus
+    url: https://metrics.ingest.monitoring.brodatzki.net/api/v1/write
+    auth:
+      type: none
+    tls:
+      certFrom: sys.env("MONITORING_CLIENT_CERT")
+      keyFrom: sys.env("MONITORING_CLIENT_KEY")
+
+  victoriaLogs:
+    type: loki
+    url: https://logs.ingest.monitoring.brodatzki.net/insert/loki/api/v1/push
+    auth:
+      type: none
+    tls:
+      certFrom: sys.env("MONITORING_CLIENT_CERT")
+      keyFrom: sys.env("MONITORING_CLIENT_KEY")
+
+clusterMetrics:
+  enabled: true
+  collector: alloy-metrics
+
+  # Enabled explicitly because controlPlane also includes kube-proxy,
+  # which does not exist in KA1.
+  controlPlane:
+    enabled: true
+
+  kubeProxy:
+    enabled: false
+
+hostMetrics:
+  enabled: true
+  collector: alloy-metrics
+  linuxHosts:
+    enabled: true
+    source: node-exporter
+
+podLogsViaLoki:
+  enabled: true
+  collector: alloy-logs
+
+clusterEvents:
+  enabled: true
+  collector: alloy-singleton
+
+selfReporting:
+  enabled: true
+
+collectors:
+  alloy-metrics:
+    presets:
+      - clustered
+      - statefulset
+    controller:
+      replicas: 1
+
+  alloy-logs:
+    presets:
+      - filesystem-log-reader
+      - daemonset
+
+  alloy-singleton:
+    presets:
+      - singleton
+
+collectorCommon:
+  alloy:
+    alloy:
+      extraEnv:
+        - name: MONITORING_CLIENT_CERT
+          valueFrom:
+            secretKeyRef:
+              name: monitoring-ingest-client
+              key: tls.crt
+        - name: MONITORING_CLIENT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: monitoring-ingest-client
+              key: tls.key
+
+telemetryServices:
+  kube-state-metrics:
+    deploy: true
+
+  node-exporter:
+    deploy: true

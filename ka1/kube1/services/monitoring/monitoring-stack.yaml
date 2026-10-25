@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: monitoring-secrets-sa
+  namespace: monitoring
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::891920435804:role/ka1-k8s-secrets-readonly
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: monitoring-secretstore
+  namespace: monitoring
+spec:
+  provider:
+    aws:
+      service: ParameterStore
+      region: eu-central-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: monitoring-secrets-sa
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: monitoring-ingest-client
+  namespace: monitoring
+spec:
+  refreshPolicy: Periodic
+  refreshInterval: 1h
+  secretStoreRef:
+    name: monitoring-secretstore
+    kind: SecretStore
+  target:
+    name: monitoring-ingest-client
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/tls
+  data:
+    - secretKey: tls.crt
+      remoteRef:
+        key: /ka1/monitoring/client-cert
+    - secretKey: tls.key
+      remoteRef:
+        key: /ka1/monitoring/client-key
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring-stack
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - chart: k8s-monitoring
+      repoURL: https://grafana.github.io/helm-charts 
+      targetRevision: 4.5.5
+      helm:
+        valueFiles:
+          - $values/ka1/kube1/services/monitoring/monitoring-values.yaml
+    - repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    automated:
+      enabled: true
+      prune: true
+      selfHeal: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
