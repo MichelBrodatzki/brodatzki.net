@@ -20,6 +20,10 @@ destinations:
       certFrom: sys.env("MONITORING_CLIENT_CERT")
       keyFrom: sys.env("MONITORING_CLIENT_KEY")
 
+annotationAutodiscovery:
+  enabled: true
+  collector: alloy-metrics
+
 clusterMetrics:
   enabled: true
   collector: alloy-metrics

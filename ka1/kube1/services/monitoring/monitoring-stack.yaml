@@ -59,6 +59,17 @@ spec:
       helm:
         valueFiles:
           - $values/ka1/kube1/services/monitoring/monitoring-values.yaml
+    - chart: prometheus-smartctl-exporter
+      repoURL: https://prometheus-community.github.io/helm-charts
+      targetRevision: 0.17.1
+      helm:
+        valuesObject:
+          podAnnotations:
+            k8s.grafana.com/scrape: "true"
+            k8s.grafana.com/job: "smartctl-exporter"
+            k8s.grafana.com/metrics.portName: "http"
+          config:
+            device_exclude: "/dev/(loop|ram|sr).*"
     - repoURL: https://github.com/MichelBrodatzki/brodatzki.net.git
       targetRevision: main
       ref: values
