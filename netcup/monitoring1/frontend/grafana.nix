@@ -79,7 +79,7 @@
           type = "victoriametrics-logs-datasource";
           access = "proxy";
           url = "http://127.0.0.1:9428";
-          isDefault = true;
+          isDefault = false;
         }
       ];
     };
