@@ -51,6 +51,38 @@
 
       analytics.reporting_enabled = false;
     };
+
+    declarativePlugins = with pkgs.grafanaPlugins; [
+      # default plugins for explore page
+      grafana-metricsdrilldown-app
+      grafana-lokiexplore-app
+      grafana-exploretraces-app
+      grafana-pyroscope-app
+      
+      # victoriametrics datasource plugins
+      victoriametrics-metrics-datasource
+      victoriametrics-logs-datasource
+    ];
+
+    provision = {
+      enable = true;
+      datasources.settings.datasources = [
+        {
+          name = "VictoriaMetrics";
+          type = "victoriametrics-metrics-datasource";
+          access = "proxy";
+          url = "http://127.0.0.1:8428";
+          isDefault = true;
+        }
+        {
+          name = "VictoriaLogs";
+          type = "victoriametrics-logs-datasource";
+          access = "proxy";
+          url = "http://127.0.0.1:9428";
+          isDefault = true;
+        }
+      ];
+    };
   };
 
   systemd.services.grafana.serviceConfig = {
