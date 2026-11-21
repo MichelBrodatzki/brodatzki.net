@@ -95,7 +95,7 @@ spec:
       hostname: mosquitto
       containers:
         - name: mosquitto
-          image: eclipse-mosquitto:2.0.22-openssl
+          image: eclipse-mosquitto:2.0.23-openssl
           ports:
             - containerPort: 1883
           volumeMounts:
