@@ -80,6 +80,10 @@
           access = "proxy";
           url = "http://127.0.0.1:9428";
           isDefault = false;
+          jsonData.multitenancyHeaders = {
+            AccountID = "1";
+            ProjectID = "0";
+          };
         }
       ];
     };
