@@ -13,7 +13,7 @@ destinations:
 
   victoriaLogs:
     type: loki
-    url: https://logs.ingest.monitoring.brodatzki.net/insert/loki/api/v1/push
+    url: "https://logs.ingest.monitoring.brodatzki.net/insert/loki/api/v1/push?_msg_field=_msg,msg,message"
     auth:
       type: none
     tls:
